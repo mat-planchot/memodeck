@@ -2,12 +2,12 @@ version: '3.0'
 
 services:
   mysql:
-    image: mariadb
+    image: mariadb:latest
     restart: on-failure
     environment:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_ROOT_PASSWORD: epsiroot
+      MYSQL_ROOT_PASSWORD: 'epsiroot'
       MYSQL_DATABASE: ${DB_DATABASE}
     volumes:
       - ./src/db/:/docker-entrypoint-initdb.d
