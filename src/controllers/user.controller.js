@@ -116,7 +116,7 @@ class UserController {
 
         // user matched!
         const secretKey = process.env.SECRET_JWT || "";
-        const token = jwt.sign({ user_id: user.id.toString() }, secretKey, {
+        const token = jwt.sign({ user_id: user.iduser }, secretKey, {
             expiresIn: '24h'
         });
 
@@ -140,9 +140,4 @@ class UserController {
     }
 }
 
-
-
-/******************************************************************************
- *                               Export
- ******************************************************************************/
 module.exports = new UserController;

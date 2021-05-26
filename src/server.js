@@ -4,6 +4,8 @@ const cors = require("cors");
 const HttpException = require('./utils/HttpException.utils');
 const errorMiddleware = require('./middleware/error.middleware');
 const userRouter = require('./routes/user.route');
+const deckRouter = require('./routes/deck.route');
+const cardRouter = require('./routes/card.route');
 
 // Init express
 const app = express();
@@ -20,6 +22,8 @@ app.options("*", cors());
 const port = Number(process.env.PORT || 3331);
 
 app.use(`/api/v1/users`, userRouter);
+app.use(`/api/v1/decks`, deckRouter);
+app.use(`/api/v1/cards`, cardRouter);
 
 // 404 error
 app.all('*', (req, res, next) => {

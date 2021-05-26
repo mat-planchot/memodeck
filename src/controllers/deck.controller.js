@@ -2,7 +2,6 @@ const DeckModel = require('../models/deck.model');
 const HttpException = require('../utils/HttpException.utils');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -17,22 +16,19 @@ class DeckController {
         }
 
         deckList = deckList.map(deck => {
-            const { password, ...deckWithoutPassword } = deck;
-            return deckWithoutPassword;
+            return deck;
         });
 
         res.send(deckList);
     };
 
     getDeckById = async (req, res, next) => {
-        const deck = await DeckModel.findOne({ id: req.params.id });
+        const deck = await DeckModel.findOne({ iddeck: req.params.id });
         if (!deck) {
             throw new HttpException(404, 'Deck not found');
         }
 
-        const { password, ...deckWithoutPassword } = deck;
-
-        res.send(deckWithoutPassword);
+        res.send(deck);
     };
 
     getDeckBydeckName = async (req, res, next) => {
@@ -41,15 +37,11 @@ class DeckController {
             throw new HttpException(404, 'Deck not found');
         }
 
-        const { password, ...deckWithoutPassword } = deck;
-
-        res.send(deckWithoutPassword);
+        res.send(deck);
     };
 
     getCurrentDeck = async (req, res, next) => {
-        const { password, ...deckWithoutPassword } = req.currentDeck;
-
-        res.send(deckWithoutPassword);
+        res.send(deck);
     };
 
     createDeck = async (req, res, next) => {
@@ -112,9 +104,4 @@ class DeckController {
     }
 }
 
-
-
-/******************************************************************************
- *                               Export
- ******************************************************************************/
 module.exports = new DeckController;

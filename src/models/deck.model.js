@@ -1,6 +1,7 @@
 const query = require('../db/db-connection');
 const { multipleColumnSet } = require('../utils/common.utils');
-const Role = require('../utils/deckRoles.utils');
+const Role = require('../utils/userRoles.utils');
+
 class DeckModel {
     tableName = 'deck';
 

@@ -1,6 +1,7 @@
 const query = require('../db/db-connection');
 const { multipleColumnSet } = require('../utils/common.utils');
-const Role = require('../utils/cardRoles.utils');
+const Role = require('../utils/userRoles.utils');
+
 class CardModel {
     tableName = 'card';
 
@@ -56,6 +57,20 @@ class CardModel {
         const affectedRows = result ? result.affectedRows : 0;
 
         return affectedRows;
+    }
+
+    randomReviewCard = async (params) => {
+        const { columnSet, values } = multipleColumnSet(params)
+
+        const sql = `SELECT front, back, frontmedia, backmedia FROM ${this.tableName}
+        INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
+        WHERE ${columnSet} AND reviewcard.reviewdate = DATE(NOW())
+        ORDER BY RAND() LIMIT 1`;
+
+        const result = await query(sql, [...values]);
+
+        // return back the first row (card)
+        return result[0];
     }
 }
 
