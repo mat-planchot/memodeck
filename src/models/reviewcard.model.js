@@ -1,8 +1,9 @@
 const query = require('../db/db-connection');
 const { multipleColumnSet } = require('../utils/common.utils');
+const Role = require('../utils/userRoles.utils');
 
-class DeckModel {
-    tableName = 'deck';
+class ReviewCardModel {
+    tableName = 'reviewcard';
 
     find = async (params = {}) => {
         let sql = `SELECT * FROM ${this.tableName}`;
@@ -25,15 +26,15 @@ class DeckModel {
 
         const result = await query(sql, [...values]);
 
-        // return back the first row (deck)
+        // return back the first row (reviewcard)
         return result[0];
     }
 
-    create = async ({ deckname, fkuser }) => {
+    create = async ({ nbreview=1, issuspended=0, difficulty=0, nbdayreview=1, reviewdate = new Date().toISOString().replace(/T.+/,''), fkcard}) => {
         const sql = `INSERT INTO ${this.tableName}
-        (deckname, fkuser) VALUES (?,?)`;
+        (nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard) VALUES (?,?,?,?,?,?)`;
 
-        const result = await query(sql, [deckname, fkuser]);
+        const result = await query(sql, [nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard]);
         const affectedRows = result ? result.affectedRows : 0;
 
         return affectedRows;
@@ -42,7 +43,7 @@ class DeckModel {
     update = async (params, id) => {
         const { columnSet, values } = multipleColumnSet(params)
 
-        const sql = `UPDATE deck SET ${columnSet} WHERE iddeck = ?`;
+        const sql = `UPDATE reviewcard SET ${columnSet} WHERE idreviewcard = ?`;
 
         const result = await query(sql, [...values, id]);
 
@@ -51,7 +52,7 @@ class DeckModel {
 
     delete = async (id) => {
         const sql = `DELETE FROM ${this.tableName}
-        WHERE iddeck = ?`;
+        WHERE idreviewcard = ?`;
         const result = await query(sql, [id]);
         const affectedRows = result ? result.affectedRows : 0;
 
@@ -59,4 +60,4 @@ class DeckModel {
     }
 }
 
-module.exports = new DeckModel;
+module.exports = new ReviewCardModel;

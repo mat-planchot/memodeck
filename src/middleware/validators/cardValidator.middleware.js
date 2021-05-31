@@ -51,3 +51,19 @@ exports.updateCardSchema = [
         })
         .withMessage('Invalid updates!')
 ];
+
+exports.frontCardSchema = [
+    body('front')
+        .exists()
+        .withMessage('Front is required')
+        .isLength({ min: 1 })
+        .withMessage('Must not be empty')
+];
+
+exports.backCardSchema = [
+    body('back')
+        .exists()
+        .withMessage('Back is required')
+        .isLength({ min: 1 })
+        .withMessage('Must not be empty')
+];

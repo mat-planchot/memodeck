@@ -2,18 +2,18 @@ const express = require('express');
 const router = express.Router();
 const cardController = require('../controllers/card.controller');
 const auth = require('../middleware/auth.middleware');
-const Role = require('../utils/userRoles.utils');
 const awaitHandlerFactory = require('../middleware/awaitHandlerFactory.middleware');
 
-const { createCardSchema, updateCardSchema } = require('../middleware/validators/cardValidator.middleware');
+const { createCardSchema, updateCardSchema, frontCardSchema, backCardSchema } = require('../middleware/validators/cardValidator.middleware');
 
-
-router.get('/', auth(), awaitHandlerFactory(cardController.getAllCards)); // localhost:3000/api/v1/cards
-router.get('/id/:id', auth(), awaitHandlerFactory(cardController.getCardById)); // localhost:3000/api/v1/cards/id/1
-router.get('/cardname/:cardname', auth(), awaitHandlerFactory(cardController.getCardBycardName)); // localhost:3000/api/v1/cards/cardsname/julia
-router.get('/current', auth(), awaitHandlerFactory(cardController.getCurrentCard)); // localhost:3000/api/v1/cards/whoami
-router.post('/', createCardSchema, awaitHandlerFactory(cardController.createCard)); // localhost:3000/api/v1/cards
-router.patch('/id/:id', auth(Role.Admin), updateCardSchema, awaitHandlerFactory(cardController.updateCard)); // localhost:3000/api/v1/cards/id/1 , using patch for partial update
-router.delete('/id/:id', auth(Role.Admin), awaitHandlerFactory(cardController.deleteCard)); // localhost:3000/api/v1/cards/id/1
+// localhost:3000/api/v1/cards/...
+router.get('/', auth(), awaitHandlerFactory(cardController.getAllCards));
+router.get('/id/:id', auth(), awaitHandlerFactory(cardController.getCardById));
+router.post('/front', auth(), frontCardSchema, awaitHandlerFactory(cardController.getCardBy));
+router.post('/back', auth(), backCardSchema, awaitHandlerFactory(cardController.getCardBy));
+router.post('/review', auth(), backCardSchema, awaitHandlerFactory(cardController.getCardBy));
+router.post('/', auth(), createCardSchema, awaitHandlerFactory(cardController.createCard));
+router.patch('/id/:id', auth(), updateCardSchema, awaitHandlerFactory(cardController.updateCard));
+router.delete('/id/:id', auth(), awaitHandlerFactory(cardController.deleteCard));
 
 module.exports = router;

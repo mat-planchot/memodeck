@@ -31,8 +31,11 @@ class CardController {
         res.send(card);
     };
 
-    getCardBycardName = async (req, res, next) => {
-        const card = await CardModel.findOne({ cardname: req.params.cardname });
+    getCardBy = async (req, res, next) => {
+        this.checkValidation(req);
+
+        const card = await CardModel.findOne(req.body);
+
         if (!card) {
             throw new HttpException(404, 'Card not found');
         }
@@ -40,8 +43,29 @@ class CardController {
         res.send(card);
     };
 
-    getCurrentCard = async (req, res, next) => {
+    getRandomReviewCard = async (req, res, next) => {
+        this.checkValidation(req);
+
+        const card = await CardModel.randomReviewCard();
+
+        if (!card) {
+            throw new HttpException(404, 'Card not found');
+        }
+
         res.send(card);
+    };
+
+    getReviewCards = async (req, res, next) => {
+        let cardList = await CardModel.reviewCards();
+        if (!cardList.length) {
+            throw new HttpException(404, 'Cards not found');
+        }
+
+        cardList = cardList.map(card => {
+            return card;
+        });
+
+        res.send(cardList);
     };
 
     createCard = async (req, res, next) => {

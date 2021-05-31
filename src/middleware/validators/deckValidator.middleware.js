@@ -8,7 +8,7 @@ exports.createDeckSchema = [
         .withMessage('Must not be empty'),
 ];
 
-exports.updateCardSchema = [
+exports.updateDeckSchema = [
     body('deckname')
         .optional()
         .isLength({ min: 1 })

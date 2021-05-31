@@ -3,6 +3,7 @@ const HttpException = require('../utils/HttpException.utils');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
+const auth = require('../middleware/auth.middleware');
 dotenv.config();
 
 /******************************************************************************
@@ -46,8 +47,6 @@ class DeckController {
 
     createDeck = async (req, res, next) => {
         this.checkValidation(req);
-
-        await this.hashPassword(req);
 
         const result = await DeckModel.create(req.body);
 

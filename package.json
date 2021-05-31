@@ -5,7 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "test": "jest --forceExit"
   },
   "author": "epsi",
   "license": "ISC",
@@ -19,6 +20,8 @@
     "mysql2": "^2.1.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "jest": "^27.0.3",
+    "nodemon": "^2.0.4",
+    "supertest": "^6.1.3"
   }
 }

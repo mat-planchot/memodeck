@@ -30,11 +30,11 @@ class CardModel {
         return result[0];
     }
 
-    create = async ({ front, back, frontmedia=null, backmedia=null, iddeck }) => {
+    create = async ({ front, back, frontmedia=null, backmedia=null, fkdeck }) => {
         const sql = `INSERT INTO ${this.tableName}
         (front, back, frontmedia, backmedia, fkdeck) VALUES (?,?,?,?,?)`;
 
-        const result = await query(sql, [front, back, frontmedia, backmedia, iddeck]);
+        const result = await query(sql, [front, back, frontmedia, backmedia, fkdeck]);
         const affectedRows = result ? result.affectedRows : 0;
 
         return affectedRows;
@@ -59,18 +59,32 @@ class CardModel {
         return affectedRows;
     }
 
-    randomReviewCard = async (params) => {
-        const { columnSet, values } = multipleColumnSet(params)
+    randomReviewCard = async () => {
 
-        const sql = `SELECT front, back, frontmedia, backmedia FROM ${this.tableName}
+        const sql = `SELECT idcard, front, back, frontmedia, backmedia, fkdeck FROM ${this.tableName}
         INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
-        WHERE ${columnSet} AND reviewcard.reviewdate = DATE(NOW())
+        WHERE reviewcard.reviewdate = DATE(NOW())
         ORDER BY RAND() LIMIT 1`;
 
         const result = await query(sql, [...values]);
 
         // return back the first row (card)
         return result[0];
+    }
+
+    reviewCards = async (params = {}) => {
+        let sql = `SELECT idcard, front, back, frontmedia, backmedia, fkdeck FROM ${this.tableName}
+        INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
+        WHERE reviewcard.reviewdate = DATE(NOW())`;
+
+        if (!Object.keys(params).length) {
+            return await query(sql);
+        }
+
+        const { columnSet, values } = multipleColumnSet(params)
+        sql += ` WHERE ${columnSet}`;
+
+        return await query(sql, [...values]);
     }
 }
 

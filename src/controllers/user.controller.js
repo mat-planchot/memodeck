@@ -25,7 +25,7 @@ class UserController {
     };
 
     getUserById = async (req, res, next) => {
-        const user = await UserModel.findOne({ id: req.params.id });
+        const user = await UserModel.findOne({ iduser: req.params.id });
         if (!user) {
             throw new HttpException(404, 'User not found');
         }
