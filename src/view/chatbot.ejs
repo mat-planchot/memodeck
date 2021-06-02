@@ -5,10 +5,10 @@ Date.prototype.addDays = function(days) {
     return date;
 }
 
-var date = new Date();
-date.addDays(5).toISOString().replace(/T.+/,'')
+nbreview = params.nbreview + 1;
+difficulty = params.difficulty + 0.25;
+nbdayreview = Math.round(params.nbdayreview * params.difficulty);
 
-params.nbreview = params.nbreview + 1;
-params.difficulty = params.difficulty + 0.25;
-params.nbdayreview = Math.round(params.nbdayreview * params.difficulty);
+let date = new Date();
+date.addDays(nbdayreview).toISOString().replace(/T.+/,'')
 %>

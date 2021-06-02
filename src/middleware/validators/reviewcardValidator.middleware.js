@@ -20,7 +20,7 @@ exports.createReviewCardSchema = [
     body('reviewdate')
         .optional()
         .isString()
-        .isLength({ min: 10, max: 10 })
+        //.isLength({ min: 10, max: 10 })
         .withMessage('Must a string with exactly 10 characters for the date'),
     body('fkcard')
         .exists()
@@ -49,11 +49,12 @@ exports.updateReviewCardSchema = [
     body('reviewdate')
         .optional()
         .isString()
-        .isLength({ min: 10, max: 10 })
         .withMessage('Must be a string with exactly 10 characters for the date'),
     body('fkcard')
-        .not().exists()
-        .withMessage('fkcard is not allowed to be changed'),
+        .exists()
+        .withMessage('fkcard is not allowed to be changed')
+        .isInt()
+        .withMessage('Must not be an int'),
     body()
         .custom(value => {
             return !!Object.keys(value).length;

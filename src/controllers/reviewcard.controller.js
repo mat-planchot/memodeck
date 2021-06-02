@@ -32,8 +32,8 @@ class ReviewCardController {
         res.send(reviewcard);
     };
 
-    getReviewCardByreviewcardName = async (req, res, next) => {
-        const reviewcard = await ReviewCardModel.findOne({ reviewcardname: req.params.reviewcardname });
+    getReviewCardByIdCard = async (req, res, next) => {
+        const reviewcard = await ReviewCardModel.findOne({ fkcard: req.params.id });
         if (!reviewcard) {
             throw new HttpException(404, 'ReviewCard not found');
         }

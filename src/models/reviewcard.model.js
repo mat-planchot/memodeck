@@ -30,7 +30,7 @@ class ReviewCardModel {
         return result[0];
     }
 
-    create = async ({ nbreview=1, issuspended=0, difficulty=0, nbdayreview=1, reviewdate = new Date().toISOString().replace(/T.+/,''), fkcard}) => {
+    create = async ({ nbreview=1, issuspended=0, difficulty=1, nbdayreview=1, reviewdate, fkcard}) => {
         const sql = `INSERT INTO ${this.tableName}
         (nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard) VALUES (?,?,?,?,?,?)`;
 
@@ -43,9 +43,11 @@ class ReviewCardModel {
     update = async (params, id) => {
         const { columnSet, values } = multipleColumnSet(params)
 
-        const sql = `UPDATE reviewcard SET ${columnSet} WHERE idreviewcard = ?`;
+        const sql = `UPDATE reviewcard SET ${columnSet} 
+        , reviewdate = (NOW() + INTERVAL ? DAY)
+        WHERE idreviewcard = ?`;
 
-        const result = await query(sql, [...values, id]);
+        const result = await query(sql, [...values, params.nbdayreview, id]);
 
         return result;
     }
