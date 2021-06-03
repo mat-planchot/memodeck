@@ -191,6 +191,12 @@ describe ('/api/v1/cards', () => {
         expect(response.status).toBe(200)
     })
 
+    it('GET cards from iddeck', async () => {
+        const response = await request.get('/api/v1/cards/deck/'+iddeck)
+            .set('Authorization', `Bearer ${token}`)
+        expect(response.status).toBe(200)
+    })
+
     it('POST cards by front', async () => {
         const response = await request.post('/api/v1/cards/front')
             .set('Authorization', `Bearer ${token}`)
@@ -286,8 +292,7 @@ describe ('/api/v1/reviewcards', () => {
         const response = await request.patch('/api/v1/reviewcards/id/'+idreviewcard)
             .set('Authorization', `Bearer ${token}`)
             .send({
-                nbdayreview: 1,
-                fkcard: idcard
+                nbdayreview: 1
             });
         expect(response.status).toBe(200)
     })

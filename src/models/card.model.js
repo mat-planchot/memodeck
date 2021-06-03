@@ -64,7 +64,7 @@ class CardModel {
         // idreviewcard, nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard
         const sql = `SELECT * FROM ${this.tableName}
         INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
-        WHERE card.fkdeck = ? AND reviewcard.reviewdate = DATE(NOW())
+        WHERE card.fkdeck = ? AND reviewcard.reviewdate <= DATE(NOW())
         ORDER BY RAND() LIMIT 1`;
 
         const result = await query(sql, [params.fkdeck])
@@ -78,7 +78,7 @@ class CardModel {
         // idreviewcard, nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard
         let sql = `SELECT * FROM ${this.tableName}
         INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
-        WHERE card.fkdeck = ? AND reviewcard.reviewdate = DATE(NOW())`;
+        WHERE card.fkdeck = ? AND reviewcard.reviewdate <= DATE(NOW())`;
 
         return await query(sql, [params.fkdeck]);
     }

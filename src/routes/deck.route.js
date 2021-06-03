@@ -8,10 +8,10 @@ const { createDeckSchema, updateDeckSchema } = require('../middleware/validators
 
 // localhost:3000/api/v1/decks/...
 router.get('/', auth(), awaitHandlerFactory(deckController.getAllDecks));
-router.get('/id/:id', auth(), awaitHandlerFactory(deckController.getDeckById));
-router.get('/deckname/:deckname', auth(), awaitHandlerFactory(deckController.getDeckBydeckName));
-router.post('/', auth(), createDeckSchema, awaitHandlerFactory(deckController.createDeck));
-router.patch('/id/:id', auth(), updateDeckSchema, awaitHandlerFactory(deckController.updateDeck));
-router.delete('/id/:id', auth(), awaitHandlerFactory(deckController.deleteDeck));
+router.get('/id/:id', auth(), awaitHandlerFactory(deckController.getDeckById)); // mandatory PARAM iddeck
+router.get('/deckname/:deckname', auth(), awaitHandlerFactory(deckController.getDeckBydeckName)); // mandatory PARAM deckname
+router.post('/', auth(), createDeckSchema, awaitHandlerFactory(deckController.createDeck)); // mandatory POST deckname
+router.patch('/id/:id', auth(), updateDeckSchema, awaitHandlerFactory(deckController.updateDeck)); // mandatory PARAM iddeck and at least one value
+router.delete('/id/:id', auth(), awaitHandlerFactory(deckController.deleteDeck)); // mandatory PARAM iddeck
 
 module.exports = router;

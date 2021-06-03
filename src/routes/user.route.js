@@ -9,12 +9,12 @@ const { createUserSchema, updateUserSchema, validateLogin } = require('../middle
 
 // localhost:3000/api/v1/users
 router.get('/', auth(), awaitHandlerFactory(userController.getAllUsers)); 
-router.get('/id/:id', auth(), awaitHandlerFactory(userController.getUserById));
-router.get('/username/:username', auth(), awaitHandlerFactory(userController.getUserByuserName));
+router.get('/id/:id', auth(), awaitHandlerFactory(userController.getUserById)); // mandatory PARAM iduser
+router.get('/username/:username', auth(), awaitHandlerFactory(userController.getUserByuserName)); // mandatory PARAM username
 router.get('/whoami', auth(), awaitHandlerFactory(userController.getCurrentUser));
-router.post('/', createUserSchema, awaitHandlerFactory(userController.createUser));
-router.patch('/id/:id', auth(Role.Admin), updateUserSchema, awaitHandlerFactory(userController.updateUser));
-router.delete('/id/:id', auth(Role.Admin), awaitHandlerFactory(userController.deleteUser));
-router.post('/login', validateLogin, awaitHandlerFactory(userController.userLogin));
+router.post('/', createUserSchema, awaitHandlerFactory(userController.createUser)); // mandatory POST email, password, confirm_password
+router.patch('/id/:id', auth(Role.Admin), updateUserSchema, awaitHandlerFactory(userController.updateUser)); // mandatory PARAM iduser
+router.delete('/id/:id', auth(Role.Admin), awaitHandlerFactory(userController.deleteUser)); // mandatory PARAM iduser
+router.post('/login', validateLogin, awaitHandlerFactory(userController.userLogin)); // mandatory POST email, password *** RETURN token ***
 
 module.exports = router;

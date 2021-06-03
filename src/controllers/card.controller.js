@@ -22,6 +22,19 @@ class CardController {
         res.send(cardList);
     };
 
+    getAllCardsFromDeck = async (req, res, next) => {
+        let cardList = await CardModel.find({ fkdeck: req.params.id });
+        if (!cardList.length) {
+            throw new HttpException(404, 'Cards not found');
+        }
+
+        cardList = cardList.map(card => {
+            return card;
+        });
+
+        res.send(cardList);
+    };
+
     getCardById = async (req, res, next) => {
         const card = await CardModel.findOne({ idcard: req.params.id });
         if (!card) {

@@ -4,7 +4,7 @@ exports.createReviewCardSchema = [
     body('nbreview')
         .optional()
         .isInt()
-        .withMessage('Must not be an int'),
+        .withMessage('Must be an int'),
     body('issuspended')
         .optional()
         .isBoolean()
@@ -16,7 +16,7 @@ exports.createReviewCardSchema = [
     body('nbdayreview')
         .optional()
         .isInt()
-        .withMessage('Must not be an int'),
+        .withMessage('Must be an int'),
     body('reviewdate')
         .optional()
         .isString()
@@ -26,14 +26,14 @@ exports.createReviewCardSchema = [
         .exists()
         .withMessage('fkcard is required')
         .isInt()
-        .withMessage('Must not be an int'),
+        .withMessage('Must be an int'),
 ];
 
 exports.updateReviewCardSchema = [
     body('nbreview')
         .optional()
         .isInt()
-        .withMessage('Must not be an int'),
+        .withMessage('Must be an int'),
     body('issuspended')
         .optional()
         .isBoolean()
@@ -45,16 +45,12 @@ exports.updateReviewCardSchema = [
     body('nbdayreview')
         .optional()
         .isInt()
-        .withMessage('Must not be an int'),
+        .withMessage('Must be an int'),
     body('reviewdate')
         .optional()
         .isString()
+        //.isLength({ min: 10, max: 10 })
         .withMessage('Must be a string with exactly 10 characters for the date'),
-    body('fkcard')
-        .exists()
-        .withMessage('fkcard is not allowed to be changed')
-        .isInt()
-        .withMessage('Must not be an int'),
     body()
         .custom(value => {
             return !!Object.keys(value).length;
@@ -62,7 +58,7 @@ exports.updateReviewCardSchema = [
         .withMessage('Please provide required field to update')
         .custom(value => {
             const updates = Object.keys(value);
-            const allowUpdates = ['reviewcardname'];
+            const allowUpdates = ['nbreview', 'issuspended', 'difficulty', 'nbdayreview', 'reviewdate'];
             return updates.every(update => allowUpdates.includes(update));
         })
         .withMessage('Invalid updates!')
