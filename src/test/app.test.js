@@ -1,12 +1,17 @@
 const app = require('../app')
 const supertest = require('supertest')
-const auth = require('../middleware/auth.middleware')
 const request = supertest(app)
+const query = require('../db/db-connection');
 
 let token, iduser, iddeck, idcard, idreviewcard = null;
 
 // only at the beginning
 beforeAll(async () => {
+    await query("CREATE TABLE IF NOT EXISTS user ( iduser        INT PRIMARY KEY auto_increment,             username      VARCHAR(50) UNIQUE NOT NULL, email         VARCHAR(100) UNIQUE NOT NULL, password      CHAR(60) NOT NULL, role          ENUM('Admin', 'SuperUser', 'Professeur', 'Apprenant') DEFAULT 'Apprenant');") 
+    await query("CREATE TABLE IF NOT EXISTS deck (iddeck        INT PRIMARY KEY auto_increment, deckname      VARCHAR(25) UNIQUE NOT NULL, fkuser        INT NOT NULL, FOREIGN KEY (fkuser) REFERENCES user(iduser)); ")
+    await query("CREATE TABLE IF NOT EXISTS card(idcard        INT PRIMARY KEY auto_increment, front         TEXT NOT NULL, back          TEXT NOT NULL, frontmedia    TEXT, backmedia     TEXT, fkdeck        INT NOT NULL, FOREIGN KEY (fkdeck) REFERENCES deck(iddeck));")
+    await query("CREATE TABLE IF NOT EXISTS reviewcard( idreviewcard  INT PRIMARY KEY auto_increment, nbreview      INT NOT NULL DEFAULT 1, issuspended   BOOLEAN NOT NULL DEFAULT 0,difficulty    FLOAT(6,2) NOT NULL DEFAULT 1, nbdayreview   INT NOT NULL DEFAULT 1, reviewdate    DATE NOT NULL, fkcard        INT NOT NULL, FOREIGN KEY (fkcard) REFERENCES card(idcard));")
+
     let res = null
     // is this user created?
     res = await request.post('/api/v1/users/login')
@@ -243,12 +248,12 @@ describe ('/api/v1/cards', () => {
                     fkdeck: iddeck
                 });
             expect(response.status).toBe(201)
-            response = await request.post('/api/v1/cards/front')
+            const res = await request.post('/api/v1/cards/front')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
                     front: "example"
                 });
-            idcardex = response.body.idcard
+            idcardex = res.body.idcard
         }
         idcardex = response.body.idcard
         response = await request.get('/api/v1/reviewcards/idcard/'+idcardex)
