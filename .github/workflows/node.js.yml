@@ -19,6 +19,7 @@ jobs:
         node-version: [10.x, 12.x, 14.x, 15.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     env:
+      DB_HOST: 127.0.0.1
       DB_DATABASE: epsi
       DB_USER: root
       DB_PASS: root
@@ -28,6 +29,7 @@ jobs:
       run: |
         sudo /etc/init.d/mysql start
         mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASS }}
+    - run: mysql -u ${{ env.DB_USER }} -p{{ env.DB_PASS }} -h${{ env.DB_HOST }} < 'src/db/create-db.sql'
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
