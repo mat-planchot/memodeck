@@ -248,8 +248,9 @@ describe ('/api/v1/cards', () => {
                     front: "example"
                 });
             idcardex = res.body.idcard
+        } else { 
+            idcardex = response.body.idcard 
         }
-        idcardex = response.body.idcard
         response = await request.get('/api/v1/reviewcards/idcard/'+idcardex)
             .set('Authorization', `Bearer ${token}`)
         if (response.status != 200) {
