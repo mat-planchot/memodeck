@@ -41,6 +41,7 @@ jobs:
         DB_USER: ${{ env.DB_USER }}
         DB_PASS: ${{ env.DB_PASS}}
         SECRET_JWT: supersecret
+        PORT: 3000
     - run: npm ci
-    - run: npm start
-    - run: npm test
+    - run: npm run build --if-present
+    - run: npm run ci

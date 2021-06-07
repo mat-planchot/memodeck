@@ -5,8 +5,8 @@
   "main": "src/server.js",
   "scripts": {
     "start": "nodemon",
-    "dev": "nodemon",
-    "test": "jest --forceExit"
+    "test": "jest --forceExit",
+    "ci": "server-test 3000"
   },
   "author": "epsi",
   "license": "ISC",
@@ -23,6 +23,7 @@
   "devDependencies": {
     "jest": "^27.0.3",
     "nodemon": "^2.0.4",
+    "start-server-and-test": "^1.12.5",
     "supertest": "^6.1.3"
   }
 }
