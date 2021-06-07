@@ -6,85 +6,86 @@ let token, iduser, iddeck, idcard, idreviewcard = null;
 
 // only at the beginning
 beforeAll(async () => {
-    let res = null
     // is this user created?
-    res = await request.post('/api/v1/users/login')
+    const isloginUser = await request.post('/api/v1/users/login')
         .send({
             email: "test@test.fr",
             password:"password"
         });
     // no we create it
-    if (res.status !== 200) {
-        res = await request.post('/api/v1/users')
+    if (isloginUser.status !== 200) {
+        const createUser = await request.post('/api/v1/users')
             .send({
                 username: "test",
                 email: "test@test.fr",
                 password:"password",
                 confirm_password:"password"
             });
-        expect(res.status).toBe(201)
-        expect(res.body.message).toBe('User was created!')
+        expect(createUser.status).toBe(201)
+        expect(createUser.body.message).toBe('User was created!')
         // we want the token
-        res = await request.post('/api/v1/users/login')
+        const loginUser = await request.post('/api/v1/users/login')
             .send({
                 email: "test@test.fr",
                 password:"password"
             });
-        token = res.body.token;
-        iduser = res.body.iduser;
+        token = loginUser.body.token;
+        iduser = loginUser.body.iduser;
     }
     // user is created, we get the token
-    token = res.body.token;
-    iduser = res.body.iduser;
-    res = await request.get('/api/v1/decks/deckname/deck')
+    token = isloginUser.body.token;
+    iduser = isloginUser.body.iduser;
+    const hasDeck = await request.get('/api/v1/decks/deckname/deck')
         .set('Authorization', `Bearer ${token}`);
-    if (res.status !== 200) { // deck does not exist, we create it
-        res = await request.post('/api/v1/decks')
+    if (hasDeck.status !== 200) { // deck does not exist, we create it
+        const createDeck = await request.post('/api/v1/decks')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 deckname: "deck",
                 fkuser: iduser
             });
-        expect(res.status).toBe(201)
-        expect(res.body.message).toBe('Deck was created!')
-        res = await request.get('/api/v1/decks/deckname/deck')
+        expect(createDeck.status).toBe(201)
+        expect(createDeck.body.message).toBe('Deck was created!')
+        const getDeck = await request.get('/api/v1/decks/deckname/deck')
             .set('Authorization', `Bearer ${token}`);
-        iddeck = res.body.iddeck
+        iddeck = getDeck.body.iddeck
+    } else {
+        iddeck = hasDeck.body.iddeck
     }
-    iddeck = res.body.iddeck
-    res = await request.post('/api/v1/cards/front')
+    const hasCard = await request.post('/api/v1/cards/front')
         .set('Authorization', `Bearer ${token}`)
         .send({
             front: "question"
         });
-    if (res.status !== 200) { // card does not exist, we create it
-        res = await request.post('/api/v1/cards')
+    if (hasCard.status !== 200) { // card does not exist, we create it
+        const createCard = await request.post('/api/v1/cards')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 front: "question",
                 back: "answer",
                 fkdeck: iddeck
             });
-        expect(res.status).toBe(201)
-        expect(res.body.message).toBe('Card was created!')
-        res = await request.post('/api/v1/cards/front')
+        expect(createCard.status).toBe(201)
+        expect(createCard.body.message).toBe('Card was created!')
+        const getCard = await request.post('/api/v1/cards/front')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 front: "question"
             });
-        idcard = res.body.idcard
+        idcard = getCard.body.idcard
+    } else { 
+        idcard = hasCard.body.idcard 
     }
-    idcard = res.body.idcard
-    res = await request.get('/api/v1/reviewcards')
+    const hasReviewCards = await request.get('/api/v1/reviewcards')
         .set('Authorization', `Bearer ${token}`)
-    if (res.status !== 200) { // reviewcard does not exist, we create it
-        res = await request.post('/api/v1/reviewcards')
+    if (hasReviewCards.status !== 200) { // reviewcard does not exist, we create it
+        const createReviewCard = await request.post('/api/v1/reviewcards')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 reviewdate: new Date().toISOString().replace(/T.+/,''),
                 fkcard: idcard
             });
-        expect(res.status).toBe(201)
+        expect(createReviewCard.status).toBe(201)
         idreviewcard = 1
     } else {
         const response = await request.get('/api/v1/reviewcards/idcard/'+idcard)
