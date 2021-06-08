@@ -13,13 +13,13 @@ Les ports sont définis dans le fichier `.env` pour les variables d'environnemen
 
 Il est nécessaire d'avoir une version node.js pour lancer l'application.
 ```
-# lancer l'application par défaut avec node
+# lancer l'application
 npm start
 
-# lancer l'application avec nodemon
-npm run dev
-
-# lancer les tests jest et supertest
+# lancer les tests jest et supertest (lancement préalable du serveur requis)
 npm run test
+
+# lancer le serveur (port 3000) et les tests
+npm run ci
 ```
 Les fichiers dans le dossier `src/routes` décrivent l'API et les routes du sites.
