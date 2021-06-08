@@ -10,6 +10,10 @@
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
 </head>
 <body>
+    <div class="content-bouton">
+        <button class="btn-create-card">Créer une carte</button>
+        <button class="btn-create-deck" onclick="createCards()">Créer un dossier</button>
+    </div>
     <div>
         <table>
             <tr>
@@ -17,14 +21,8 @@
                 <th data-field="name" data-sortable="true">front</th>
                 <th data-field="salary" data-sortable="true">back</th>
             </tr>
-            <% cards.forEach(c => { %>
-                <tr>
-                    <td><%= c.idcard %> </td>
-                    <td><%= c.front %> </td>
-                    <td><%= c.back %> </td>
-                </tr>
-            <% }); %>
         </table>
     </div>
+    <script src="../public/js/ajax.js"></script>
 </body>
 </html>
