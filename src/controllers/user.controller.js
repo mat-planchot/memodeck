@@ -122,6 +122,9 @@ class UserController {
 
         const { password, ...userWithoutPassword } = user;
 
+        req.session.username = user.username
+        req.session.iduser = user.iduser
+        req.session.token = token
         res.send({ ...userWithoutPassword, token });
     };
 

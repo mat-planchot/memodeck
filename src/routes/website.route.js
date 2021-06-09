@@ -4,21 +4,20 @@ const router = express.Router();
 
 // localhost:3000/...
 router.get('/', async (req, res) => {
-    res.render('index', {title: "Accueil"})
+    let username = res.locals.username
+    res.render('index', {title: "Accueil", token: res.locals.token, iduser: res.locals.iduser, username})
 });
 
 router.get('/bot', async (req, res) => {
-    res.render('chatbot', {cards, title: "Accueil"})
+    res.render('chatbot', {title: "MemoBot"})
 });
 
 router.get('/login', async (req, res) => {
-    const cards = [ { idcard: 1, front: "question", back: "réponse" } ]
-    res.render('login', {cards, title: "Accueil"})
+    res.render('login', {title: "Connexion"})
 });
 
 router.get('/signup', async (req, res) => {
-    const cards = [ { idcard: 1, front: "question", back: "réponse" } ]
-    res.render('signup', {cards, title: "Accueil"})
+    res.render('signup', {title: "Inscription"})
 });
 
 module.exports = router;

@@ -1,18 +1,7 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" type="image/png" href="assets/img/favicon.ico">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-
-  <title><%= title %></title>
-
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-</head>
-<body>
+<%- include('template/header', {title: title}) %> 
     <div class="form_sign">
-        <form action="loginUser()" method="POST">
-            <input type="email" name="email" id="email">
+        <form id="form_sign" action="/api/v1/users/login" method="POST">
+            <input type="text" name="email" id="email">
             <input type="password" name="password" id="password">
             <input type="submit" value="se connecter">
         </form>
@@ -23,19 +12,23 @@
         $(document).ready(function() {
             $('#form_sign').submit(function(event) {
 
-                let route = '/api/v1/users/login';
+                event.preventDefault();
+
+                const route = $('#form_sign').attr('action');
+                console.log("route: "+ route)
                 let formData = {
                     email : $('input[name=email]').val(),
                     password : $('input[name=password]').val()
                 }
 
-                console.log(formData);
+                console.log("email: "+formData.email);
 
                 $.ajax({
                     url: route,
-                    method: 'POST',
-                    data: formData,
+                    type: 'POST',
+                    data: JSON.stringify(formData),
                     dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
                     success(json){
                         if(json){
                             console.log(json)
@@ -43,9 +36,7 @@
                     }
                 });
 
-                event.preventDefault();
             });
         });
     </script>
-</body>
-</html>
+<%- include('template/footer') %> 

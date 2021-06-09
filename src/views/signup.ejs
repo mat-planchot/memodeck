@@ -1,23 +1,19 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <link rel="icon" type="image/png" href="assets/img/favicon.ico">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-
-  <title><%= title %></title>
-
-  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
-</head>
+<%- include('template/header', {title: title}) %> 
 <body>
     <div class="content_form">
-        <form id="form_sign" action="" method="POST">
+        <form id="form_sign" action="/api/v1/users" method="POST">
+            <label for="username">Nom d'utilisateur :</label>
+            <input type="text" name="username" id="username">
+            <br>
+            <label for="email">Email :</label>
             <input type="email" name="email" id="email">
-            <input type="password" name="password" id="password">
-            <input type="password" name="confirm_password" id="confirm_password">
-            <select name="select_role" id="select_role">
-                <option value="Apprenant">Apprenant</option>
-            </select>
+            <br>
+            <label for="password">Mot de passe :</label>
+            <input type="password" name="password" id="password" minlength="6" maxlength="20">
+            <br>
+            <label for="confirm_password">Confirmation :</label>
+            <input type="password" name="confirm_password" id="confirm_password" minlength="6" maxlength="20">
+            <br>
             <input type="submit" value="s'inscrire">
         </form>
     </div>
@@ -27,21 +23,26 @@
         $(document).ready(function() {
             $('#form_sign').submit(function(event) {
 
-                let route = '/api/v1/users';
+                event.preventDefault();
+
+                const route = $('#form_sign').attr('action');
+                console.log("route: "+ route)
                 let formData = {
+                    username : $('input[name=username]').val(),
                     email : $('input[name=email]').val(),
-                    role : $('select[name=select_role]').val(),
                     password : $('input[name=password]').val(),
                     confirm_password : $('input[name=confirm_password]').val()
                 }
 
-                console.log(formData);
+                console.log("email: "+formData.email);
+                console.log(JSON.stringify(formData));
 
                 $.ajax({
                     url: route,
-                    method: 'POST',
-                    data: formData,
+                    type: 'POST',
+                    data: JSON.stringify(formData),
                     dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
                     success(json){
                         if(json){
                             console.log(json)
@@ -49,9 +50,7 @@
                     }
                 });
 
-                event.preventDefault();
             });
         });
     </script>
-</body>
-</html>
+<%- include('template/footer') %> 

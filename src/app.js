@@ -8,10 +8,20 @@ const userRouter = require('./routes/user.route');
 const deckRouter = require('./routes/deck.route');
 const cardRouter = require('./routes/card.route');
 const reviewcardRouter = require('./routes/reviewcard.route');
+const session = require('express-session');
 
 // Init express
 const app = express();
 
+app.use(session({secret: 'dqsxieajzksvcr',saveUninitialized: true,resave: true, cookie: { username: "", iduser: 0, token: "" }}));
+app.use(function(req, res, next) {
+    console.log(req.session)
+    res.locals.username = req.session.username;
+    res.locals.token = req.session.token;
+    res.locals.iduser = req.session.iduser;
+    console.log(res.locals)
+    next();
+  });
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
