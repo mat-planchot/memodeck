@@ -17,7 +17,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 // parse requests of content-type: application/json
 // parses incoming requests with JSON payloads
-app.use('/public', express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname + 'public')));
 app.use(express.json());
 // enabling cors for all requests by using cors middleware
 app.use(cors());
