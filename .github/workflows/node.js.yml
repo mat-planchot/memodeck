@@ -18,11 +18,6 @@ jobs:
       matrix:
         node-version: [12.x, 14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    env:
-      DB_HOST: 127.0.0.1
-      DB_DATABASE: epsi
-      DB_USER: root
-      DB_PASS: root
     
     services:
       mariadb:
@@ -30,9 +25,9 @@ jobs:
         ports:
           - 3306
         env:
-          MYSQL_USER: ${{ env.DB_USER }}
-          MYSQL_PASSWORD: ${{ env.DB_PASS }}
-          MYSQL_DATABASE: ${{ env.DB_DATABASE }}
+          DB_DATABASE: epsi
+          DB_USER: root
+          DB_PASS: root
           MYSQL_ROOT_PASSWORD: password
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
 
@@ -48,10 +43,10 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
       env:
-        DB_HOST: ${{ env.DB_HOST }}
-        DB_DATABASE: ${{ env.DB_DATABASE }}
-        DB_USER: ${{ env.DB_USER }}
-        DB_PASS: ${{ env.DB_PASS}}
+        DB_HOST: 127.0.0.1
+        DB_DATABASE: epsi
+        DB_USER: root
+        DB_PASS: root
         SECRET_JWT: supersecret
         PORT: 3000
     - run: npm ci
