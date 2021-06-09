@@ -3,6 +3,7 @@
         <button class="btn-create-card">Créer une carte</button>
         <button class="btn-create-deck" onclick="createCards()">Créer un dossier</button>
     </div>
+    <h3>Bonjour <%= session.username %></h3>
     <div>
         <table>
             <tr>
@@ -14,10 +15,7 @@
         <h1>Ajouter un paquet</h1>
         <form id="create_deck" action="/api/v1/decks" method="POST">
             <label for="front">Nom du paquet :</label>
-            <input type="text" name="front" id="front">
-            <br>
-            <imput type="hidden" name="iduser" value=<%= iduser %> />
-            <imput type="hidden" name="token" value=<%= token %> />
+            <input type="text" name="deckname" id="deckname">
             <br>
             <input type="submit" value="ajouter">
         </form>
@@ -28,8 +26,11 @@
             <br>
             <label for="back">Réponse :</label>
             <input type="text" name="back" id="back">
-            <imput type="hidden" name="iddeck" value="iddeck">
-            <imput type="hidden" name="token" value=<%= token %> />
+            <br>
+            <label for="deck">Paquet :</label>
+            <select name="deck" id="deck">
+                <option>--------------</option>
+            </select>
             <br>
             <input type="submit" value="ajouter">
         </form>
@@ -45,23 +46,16 @@
                 const route = $('#create_deck').attr('action');
                 console.log("route: "+ route)
                 let formData = {
-                    deckname : $('input[name=front]').val(),
+                    deckname : $('input[name=deckname]').val(),
                     fkuser : $('input[name=iduser]').val()
                 }
-                let token = $('input[name=token]').val();
-
-                console.log("token: "+token);
                 console.log(JSON.stringify(formData));
-
                 $.ajax({
                     url: route,
                     type: 'POST',
                     data: JSON.stringify(formData),
                     dataType: 'json',
                     contentType: "application/json; charset=utf-8",
-                    beforeSend: function (xhr) {
-                        xhr.setRequestHeader('Authorization', 'Bearer '+token);
-                    },
                     success(json){
                         if(json){
                             console.log(json)

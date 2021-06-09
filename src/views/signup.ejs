@@ -33,10 +33,7 @@
                     password : $('input[name=password]').val(),
                     confirm_password : $('input[name=confirm_password]').val()
                 }
-
-                console.log("email: "+formData.email);
                 console.log(JSON.stringify(formData));
-
                 $.ajax({
                     url: route,
                     type: 'POST',

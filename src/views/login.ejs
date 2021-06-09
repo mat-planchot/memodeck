@@ -20,9 +20,7 @@
                     email : $('input[name=email]').val(),
                     password : $('input[name=password]').val()
                 }
-
-                console.log("email: "+formData.email);
-
+                console.log(JSON.stringify(formData));
                 $.ajax({
                     url: route,
                     type: 'POST',

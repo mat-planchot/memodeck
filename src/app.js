@@ -13,15 +13,7 @@ const session = require('express-session');
 // Init express
 const app = express();
 
-app.use(session({secret: 'dqsxieajzksvcr',saveUninitialized: true,resave: true, cookie: { username: "", iduser: 0, token: "" }}));
-app.use(function(req, res, next) {
-    console.log(req.session)
-    res.locals.username = req.session.username;
-    res.locals.token = req.session.token;
-    res.locals.iduser = req.session.iduser;
-    console.log(res.locals)
-    next();
-  });
+app.use(session({secret: 'dqsxieajzksvcr',saveUninitialized: true,resave: true}));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

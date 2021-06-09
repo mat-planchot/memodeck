@@ -5,7 +5,7 @@ const router = express.Router();
 // localhost:3000/...
 router.get('/', async (req, res) => {
     let username = res.locals.username
-    res.render('index', {title: "Accueil", token: res.locals.token, iduser: res.locals.iduser, username})
+    res.render('index', {title: "Accueil", session: req.session})
 });
 
 router.get('/bot', async (req, res) => {

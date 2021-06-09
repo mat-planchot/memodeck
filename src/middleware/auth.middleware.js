@@ -7,14 +7,14 @@ dotenv.config();
 const auth = (...roles) => {
     return async function (req, res, next) {
         try {
-            const authHeader = req.headers.authorization;
+            const authHeader = req.session.token ? req.session.token : req.headers.authorization;
             const bearer = 'Bearer ';
 
-            if (!authHeader || !authHeader.startsWith(bearer)) {
+            if (!authHeader || !authHeader.startsWith(bearer) && req.headers.authorization) {
                 throw new HttpException(401, 'Access denied. No credentials sent!');
             }
 
-            const token = authHeader.replace(bearer, '');
+            const token = req.session.token ? authHeader : authHeader.replace(bearer, '');
             const secretKey = process.env.SECRET_JWT || "";
 
             // Verify Token

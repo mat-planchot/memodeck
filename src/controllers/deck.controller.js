@@ -47,6 +47,7 @@ class DeckController {
 
     createDeck = async (req, res, next) => {
         this.checkValidation(req);
+        req.body.fkuser = req.session.iduser
 
         const result = await DeckModel.create(req.body);
 
