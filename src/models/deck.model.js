@@ -17,6 +17,16 @@ class DeckModel {
         return await query(sql, [...values]);
     }
 
+    findCards = async (params = {}) => {
+        // iddeck, deckname, fkuser
+        // idcard, front, back, frontmedia, backmedia, fkdeck
+        let sql = `SELECT * FROM ${this.tableName}
+        INNER JOIN card ON card.fkdeck = deck.iddeck
+        WHERE deck.iddeck = ? AND deck.fkuser = ?`
+
+        return await query(sql, [params.iddeck, params.fkuser]);
+    }
+
     findOne = async (params) => {
         const { columnSet, values } = multipleColumnSet(params)
 

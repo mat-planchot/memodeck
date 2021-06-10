@@ -23,6 +23,19 @@ class DeckController {
         res.send(deckList);
     };
 
+    getAllCardsFromDeckUser = async (req, res, next) => {
+        let deckList = await DeckModel.findCards({ iddeck: req.params.iddeck, fkuser: req.params.iduser });
+        if (!deckList.length) {
+            throw new HttpException(404, 'Decks not found');
+        }
+
+        deckList = deckList.map(deck => {
+            return deck;
+        });
+
+        res.send(deckList);
+    };
+
     getDeckById = async (req, res, next) => {
         const deck = await DeckModel.findOne({ iddeck: req.params.id });
         if (!deck) {

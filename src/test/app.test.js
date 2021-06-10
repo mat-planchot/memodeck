@@ -94,6 +94,9 @@ beforeAll(async () => {
     }
 })
 
+/**
+ * USERS
+ */
 describe ('/api/v1/users', () => {
 
     it('POST user login', async () => {
@@ -146,6 +149,9 @@ describe ('/api/v1/users', () => {
     })
 })
 
+/**
+ * DECKS
+ */
 describe ('/api/v1/decks', () => {
 
     it('GET deckname', async () => {
@@ -164,6 +170,20 @@ describe ('/api/v1/decks', () => {
         expect(response.body.deckname).toBe('deck')
     })
 
+    it('POST all cards from a deck of a user', async () => {
+        const response = await request.get('/api/v1/decks/'+iddeck+'/user/'+iduser)
+            .set('Authorization', `Bearer ${token}`)
+        console.log(response.body)
+        expect(response.status).toBe(200)
+        expect(response.body[0].iddeck).toBe(iddeck)
+        expect(response.body[0].deckname).toBe('deck')
+        expect(response.body[0].idcard).toBe(idcard)
+        expect(response.body[0].front).toBe('question')
+        expect(response.body[0].back).toBe('answer')
+        expect(response.body[0].frontmedia).toBe(null)
+        expect(response.body[0].backmedia).toBe(null)
+    })
+
     it('GET decks', async () => {
         const response = await request.get('/api/v1/decks')
             .set('Authorization', `Bearer ${token}`)
@@ -171,6 +191,9 @@ describe ('/api/v1/decks', () => {
     })
 })
 
+/**
+ * CARDS
+ */
 describe ('/api/v1/cards', () => {
 
     it('GET idcard', async () => {
@@ -281,6 +304,9 @@ describe ('/api/v1/cards', () => {
     })
 })
 
+/**
+ * REVIEWCARDS
+ */
 describe ('/api/v1/reviewcards', () => {
     it('GET review cards', async () => {
         const response = await request.get('/api/v1/reviewcards')

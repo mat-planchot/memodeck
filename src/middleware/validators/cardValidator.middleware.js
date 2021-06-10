@@ -1,6 +1,24 @@
+/******************************************************************************
+ * "body" refers to the http response body. We need this to check that the 
+ * content has correctly been sent by the browser.
+ */
 const { body } = require('express-validator');
 
-
+/**
+ * This export like the others below, export a module, more precisely a 
+ * ValidationChain from the package 'express-validator'.
+ * For example with body('front'), the body response sent by the browser named 
+ * 'front', we check if this parameter exists if not, there is the associated 
+ * message 'Front is required' and we make also sure that the length is at
+ * least 1 character long so it must not be empty.
+ * Validations are quite easy to understand but custom a bit more complex.
+ * There is no name in the body(). With custom(), we inspect all the value of
+ * the body as a whole. Then we apply a custom javascript function.
+ * For instance it is possible to parse the length of the body parameters and
+ * if they should be in the body.
+ * 
+ * These validations are called according to the function they refer.
+ */
 exports.createCardSchema = [
     body('front')
         .exists()
