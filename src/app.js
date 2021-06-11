@@ -20,6 +20,8 @@ app.set('view engine', 'ejs');
 // parse requests of content-type: application/json
 // parses incoming requests with JSON payloads
 app.use(express.static(path.join(__dirname + 'public')));
+// to include static files
+app.use(express.static(__dirname + '/public'));
 app.use(express.json());
 // enabling cors for all requests by using cors middleware
 app.use(cors());

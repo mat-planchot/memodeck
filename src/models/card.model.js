@@ -4,6 +4,7 @@ const Role = require('../utils/userRoles.utils');
 
 class CardModel {
     tableName = 'card';
+    // idcard, front, back, frontmedia, backmedia, fkdeck
 
     find = async (params = {}) => {
         let sql = `SELECT * FROM ${this.tableName}`;

@@ -173,7 +173,6 @@ describe ('/api/v1/decks', () => {
     it('POST all cards from a deck of a user', async () => {
         const response = await request.get('/api/v1/decks/'+iddeck+'/user/'+iduser)
             .set('Authorization', `Bearer ${token}`)
-        console.log(response.body)
         expect(response.status).toBe(200)
         expect(response.body[0].iddeck).toBe(iddeck)
         expect(response.body[0].deckname).toBe('deck')
