@@ -4,8 +4,7 @@ const router = express.Router();
 
 // localhost:3000/...
 router.get('/', async (req, res) => {
-    let username = res.locals.username
-    const css = "/css/main.css"
+    const css = "/css/rotating-card.css"
     res.render('index', {title: "Accueil", css, session: req.session})
 });
 

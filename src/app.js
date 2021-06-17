@@ -13,7 +13,7 @@ const session = require('express-session');
 // Init express
 const app = express();
 
-app.use(session({secret: 'dqsxieajzksvcr',saveUninitialized: true,resave: true}));
+app.use(session({secret: 'dqsxieajzksvcr',cookie: { maxAge: 60000 }, saveUninitialized: true,resave: false}));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
