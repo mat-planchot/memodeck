@@ -19,25 +19,22 @@ jobs:
         node-version: [12.x, 14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     
-    services:
-      mariadb:
-        image: mariadb:latest
-        ports:
-          - 3306
-        env:
-          DB_DATABASE: epsi
-          DB_USER: root
-          DB_PASS: root
-          MYSQL_ROOT_PASSWORD: password
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
-
     steps:
     - uses: actions/checkout@v2
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+
+    - # ... some steps before set-up MySQL ...
+    - name: Set up MariaDB
+      uses: getong/mariadb-action@v1.1
+      with:
+        mysql database: 'epsi' # Optional, default value is "test". The specified database which will be create
+        mysql user: 'epsi' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
+        mysql password: ${{ secrets.DatabasePassword }} # Required if "mysql user" exists. The password for the "mysql user"
     - name: Verify MariaDB connection
       run: |
-        mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports['3306'] }} -uroot -proot < src/db/create-db.sql
-        mysql --host 127.0.0.1 --port ${{ job.services.mariadb.ports['3306'] }} -uroot -proot -e "SHOW DATABASES"
-        mysql -uroot -proot --host 127.0.0.1 --port=${{ job.services.mariadb.ports['3306'] }} epsi -e "CREATE TABLE IF NOT EXISTS user (iduser INT PRIMARY KEY auto_increment, username VARCHAR(50) UNIQUE NOT NULL, email VARCHAR(100) UNIQUE NOT NULL, password CHAR(60) NOT NULL, role ENUM('Admin', 'SuperUser', 'Professeur', 'Apprenant') DEFAULT 'Apprenant'); CREATE TABLE IF NOT EXISTS deck (iddeck INT PRIMARY KEY auto_increment, deckname VARCHAR(25) UNIQUE NOT NULL, fkuser INT NOT NULL, FOREIGN KEY (fkuser) REFERENCES user(iduser)); CREATE TABLE IF NOT EXISTS card(idcard INT PRIMARY KEY auto_increment, front TEXT NOT NULL, back TEXT NOT NULL, frontmedia TEXT, backmedia TEXT, fkdeck INT NOT NULL, FOREIGN KEY (fkdeck) REFERENCES deck(iddeck)); CREATE TABLE IF NOT EXISTS reviewcard( idreviewcard INT PRIMARY KEY auto_increment, nbreview INT NOT NULL DEFAULT 1, issuspended BOOLEAN NOT NULL DEFAULT 0,difficulty FLOAT(6,2) NOT NULL DEFAULT 1, nbdayreview INT NOT NULL DEFAULT 1, reviewdate DATE NOT NULL, fkcard INT NOT NULL, FOREIGN KEY (fkcard) REFERENCES card(idcard));"
+        mysql --host 0.0.0.0 --port 3306 -u epsi -p${{ secrets.DatabasePassword }} < src/db/create-db.sql
+        mysql --host 0.0.0.0 --port 3306 -u epsi -p${{ secrets.DatabasePassword }} -e "SHOW DATABASES"
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -45,8 +42,8 @@ jobs:
       env:
         DB_HOST: mysql
         DB_DATABASE: epsi
-        DB_USER: root
-        DB_PASS: root
+        DB_USER: epsi
+        DB_PASS: ${{ secrets.DatabasePassword }}
         SECRET_JWT: supersecret
         PORT: 3000
     - run: npm ci

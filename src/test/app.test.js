@@ -2,96 +2,59 @@ const app = require('../app')
 const supertest = require('supertest')
 const request = supertest(app)
 
-let token, iduser, iddeck, idcard, idreviewcard = null;
+let token, iduser, iddeck, idcard = null;
 
 // only at the beginning
 beforeAll(async () => {
-    // is this user created?
-    const isloginUser = await request.post('/api/v1/users/login')
+    const createUser = await request.post('/api/v1/users')
+        .send({
+            username: "test",
+            email: "test@test.fr",
+            password:"password",
+            confirm_password:"password"
+        });
+    console.log(createUser.body)
+    const loginUser = await request.post('/api/v1/users/login')
         .send({
             email: "test@test.fr",
             password:"password"
         });
-    // no we create it
-    if (isloginUser.status !== 200) {
-        const createUser = await request.post('/api/v1/users')
-            .send({
-                username: "test",
-                email: "test@test.fr",
-                password:"password",
-                confirm_password:"password"
-            });
-        expect(createUser.status).toBe(201)
-        expect(createUser.body.message).toBe('User was created!')
-        // we want the token
-        const loginUser = await request.post('/api/v1/users/login')
-            .send({
-                email: "test@test.fr",
-                password:"password"
-            });
-        token = loginUser.body.token;
-        iduser = loginUser.body.iduser;
-    }
-    // user is created, we get the token
-    token = isloginUser.body.token;
-    iduser = isloginUser.body.iduser;
-    const hasDeck = await request.get('/api/v1/decks/deckname/deck')
+    token = loginUser.body.token;
+    iduser = loginUser.body.iduser;
+    const createDeck = await request.post('/api/v1/decks')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            deckname: "deck",
+            fkuser: iduser
+        });
+    console.log(createDeck.body)
+    const getDeck = await request.get('/api/v1/decks/deckname/deck')
         .set('Authorization', `Bearer ${token}`);
-    if (hasDeck.status !== 200) { // deck does not exist, we create it
-        const createDeck = await request.post('/api/v1/decks')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                deckname: "deck",
-                fkuser: iduser
-            });
-        expect(createDeck.status).toBe(201)
-        expect(createDeck.body.message).toBe('Deck was created!')
-        const getDeck = await request.get('/api/v1/decks/deckname/deck')
-            .set('Authorization', `Bearer ${token}`);
-        iddeck = getDeck.body.iddeck
-    } else {
-        iddeck = hasDeck.body.iddeck
-    }
-    const hasCard = await request.post('/api/v1/cards/front')
+    iddeck = getDeck.body.iddeck
+    const createCard = await request.post('/api/v1/cards')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+            front: "question",
+            back: "answer",
+            fkdeck: iddeck,
+            reviewdate: null
+        });
+    console.log(createCard.body)
+    const getCard = await request.post('/api/v1/cards/front')
         .set('Authorization', `Bearer ${token}`)
         .send({
             front: "question"
         });
-    if (hasCard.status !== 200) { // card does not exist, we create it
-        const createCard = await request.post('/api/v1/cards')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                front: "question",
-                back: "answer",
-                fkdeck: iddeck
-            });
-        expect(createCard.status).toBe(201)
-        expect(createCard.body.message).toBe('Card was created!')
-        const getCard = await request.post('/api/v1/cards/front')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                front: "question"
-            });
-        idcard = getCard.body.idcard
-    } else { 
-        idcard = hasCard.body.idcard 
-    }
-    const hasReviewCards = await request.get('/api/v1/reviewcards')
-        .set('Authorization', `Bearer ${token}`)
-    if (hasReviewCards.status !== 200) { // reviewcard does not exist, we create it
-        const createReviewCard = await request.post('/api/v1/reviewcards')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                reviewdate: new Date().toISOString().replace(/T.+/,''),
-                fkcard: idcard
-            });
-        expect(createReviewCard.status).toBe(201)
-        idreviewcard = 1
-    } else {
-        const response = await request.get('/api/v1/reviewcards/idcard/'+idcard)
-            .set('Authorization', `Bearer ${token}`)
-        idreviewcard = response.body.idreviewcard
-    }
+    idcard = getCard.body.idcard
+})
+
+afterAll(async () => {
+    const deleteCard = await request.delete('/api/v1/cards/id/'+idcard)
+        .set('Authorization', `Bearer ${token}`);
+        expect(deleteCard.status).toBe(200)
+    const deleteDeck = await request.delete('/api/v1/decks/id/'+iddeck)
+        .set('Authorization', `Bearer ${token}`);
+        expect(deleteDeck.status).toBe(200)
 })
 
 /**
@@ -205,6 +168,12 @@ describe ('/api/v1/cards', () => {
         expect(response.body.frontmedia).toBe(null)
         expect(response.body.backmedia).toBe(null)
         expect(response.body.fkdeck).toBe(iddeck)
+        expect(response.body.nbreview).toBe(1)
+        expect(response.body.issuspended).toBe(0)
+        expect(response.body.difficulty).toBe(1)
+        expect(response.body.nbdayreview).toBe(1)
+        //let date = new Date(response.body.reviewdate).toISOString().replace(/T.+/,'')
+        //expect(date).toBe(new Date().toISOString().replace(/T.+/,''))
     })
 
     it('GET cards', async () => {
@@ -250,104 +219,71 @@ describe ('/api/v1/cards', () => {
     })
 
     it('GET review cards', async () => {
-        let response, idcardex = null
-        response = await request.post('/api/v1/cards/front')
+        let idcardex = null
+        const newCard = await request.post('/api/v1/cards')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                front: "example",
+                back: "for now",
+                fkdeck: iddeck,
+                reviewdate: new Date().toISOString().replace(/T.+/,'')
+            });
+        expect(newCard.status).toBe(201)
+        const getNewCard = await request.post('/api/v1/cards/front')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 front: "example"
             });
-        if (response.status != 200) {
-            response = await request.post('/api/v1/cards')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    front: "example",
-                    back: "for now",
-                    fkdeck: iddeck
-                });
-            expect(response.status).toBe(201)
-            const res = await request.post('/api/v1/cards/front')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    front: "example"
-                });
-            idcardex = res.body.idcard
-        } else { 
-            idcardex = response.body.idcard 
-        }
-        response = await request.get('/api/v1/reviewcards/idcard/'+idcardex)
-            .set('Authorization', `Bearer ${token}`)
-        if (response.status != 200) {
-            response = await request.post('/api/v1/reviewcards')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    reviewdate: new Date().toISOString().replace(/T.+/,''),
-                    fkcard: idcardex
-                });
-            expect(response.status).toBe(201)
-        }
-        response = await request.post('/api/v1/cards/reviewcards')
+        idcardex = getNewCard.body.idcard
+        const reviewCards = await request.post('/api/v1/cards/reviewcards')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 fkdeck: iddeck
             });
-        expect(response.status).toBe(200)
+        expect(reviewCards.status).toBe(200)
     
         // random review card but there is only one this day
-        response = await request.post('/api/v1/cards/reviewcard')
+        const reviewCard = await request.post('/api/v1/cards/reviewcard')
             .set('Authorization', `Bearer ${token}`)
             .send({
                 fkdeck: iddeck
             });
-        expect(response.status).toBe(200)
-        expect(response.body.fkcard).toBe(idcardex)
-    })
-})
+        expect(reviewCard.status).toBe(200)
+        expect(reviewCard.body.idcard).toBe(idcardex)
 
-/**
- * REVIEWCARDS
- */
-describe ('/api/v1/reviewcards', () => {
-    it('GET review cards', async () => {
-        const response = await request.get('/api/v1/reviewcards')
-            .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(200)
+        const deleteCard = await request.delete('/api/v1/cards/id/'+idcardex)
+            .set('Authorization', `Bearer ${token}`);
+        expect(deleteCard.status).toBe(200)
     })
 
-    it('UPDATE review card', async () => {
-        const date = new Date().toISOString().replace(/T.+/,'')
-        const response = await request.patch('/api/v1/reviewcards/id/'+idreviewcard)
+    it('PATCH update review date', async () => {
+        const getCard = await request.post('/api/v1/cards/front')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                nbdayreview: 1
+                front: "question"
             });
-        expect(response.status).toBe(200)
-    })
-
-    it('GET review card by id', async () => {
-        const response = await request.get('/api/v1/reviewcards/id/'+idreviewcard)
+        console.log(getCard.body)
+        let nbreview = getCard.body.nbreview + 1;
+        let difficulty = getCard.body.nbdayreview + 0.25;
+        let nbdayreview = Math.round(getCard.body.nbdayreview * difficulty);
+        const updateReviewDate = await request.patch('/api/v1/cards/dayreview/'+idcard)
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(200)
-        expect(response.body.idreviewcard).toBe(idreviewcard)
-        expect(response.body.nbreview).toBe(1)
-        expect(response.body.issuspended).toBe(0)
-        expect(response.body.difficulty).toBe(1)
-        expect(response.body.nbdayreview).toBe(1)
-        expect(response.body.fkcard).toBe(idcard)
-        let date = new Date(response.body.reviewdate).toISOString().replace(/T.+/,'')
-        expect(date).toBe(new Date().toISOString().replace(/T.+/,''))
-    })
-
-    it('GET review card by id', async () => {
-        const response = await request.get('/api/v1/reviewcards/idcard/'+idcard)
+            .send({
+                nbdayreview: nbdayreview,
+                nbreview: nbreview,
+                difficulty: difficulty
+            });
+        expect(updateReviewDate.status).toBe(200)
+        const getCardGood = await request.post('/api/v1/cards/front')
             .set('Authorization', `Bearer ${token}`)
-        expect(response.status).toBe(200)
-        expect(response.body.idreviewcard).toBe(idreviewcard)
-        expect(response.body.nbreview).toBe(1)
-        expect(response.body.issuspended).toBe(0)
-        expect(response.body.difficulty).toBe(1)
-        expect(response.body.nbdayreview).toBe(1)
-        expect(response.body.fkcard).toBe(idcard)
-        let date = new Date(response.body.reviewdate).toISOString().replace(/T.+/,'')
+            .send({
+                front: "question"
+            });
+        expect(getCardGood.status).toBe(200)
+        expect(getCardGood.body.nbdayreview).toBe(nbdayreview)
+        expect(getCardGood.body.difficulty).toBe(difficulty)
+        expect(getCardGood.body.nbreview).toBe(nbreview)
+        let date = new Date(getCardGood.body.reviewdate).toISOString().replace(/T.+/,'')
         expect(date).toBe(new Date().toISOString().replace(/T.+/,''))
     })
 })

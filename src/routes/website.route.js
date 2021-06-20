@@ -22,5 +22,14 @@ router.get('/signup', async (req, res) => {
     const css = "/css/login.css"
     res.render('signup', {title: "Inscription", css})
 });
+router.get('/logout', async (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return console.log(err);
+        }
+        const css = "/css/login.css"
+        res.redirect('login', {title: "Connexion", css})
+    });
+});
 
 module.exports = router;

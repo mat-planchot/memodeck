@@ -84,8 +84,6 @@ class CardController {
     createCard = async (req, res, next) => {
         this.checkValidation(req);
 
-        await this.hashPassword(req);
-
         const result = await CardModel.create(req.body);
 
         if (!result) {
@@ -98,13 +96,25 @@ class CardController {
     updateCard = async (req, res, next) => {
         this.checkValidation(req);
 
-        await this.hashPassword(req);
-
-        const { confirm_password, ...restOfUpdates } = req.body;
-
         // do the update query and get the result
         // it can be partial edit
-        const result = await CardModel.update(restOfUpdates, req.params.id);
+        const result = await CardModel.update(req.body, req.params.id);
+
+        if (!result) {
+            throw new HttpException(404, 'Something went wrong');
+        }
+
+        const { affectedRows, changedRows, info } = result;
+
+        const message = !affectedRows ? 'Card not found' :
+            affectedRows && changedRows ? 'Card updated successfully' : 'Updated faild';
+
+        res.send({ message, info });
+    };
+
+    updateReviewDate = async (req, res, next) => {
+        // do the update query and get the result
+        const result = await CardModel.updateReviewDate(req.body, req.params.id);
 
         if (!result) {
             throw new HttpException(404, 'Something went wrong');
@@ -130,13 +140,6 @@ class CardController {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
             throw new HttpException(400, 'Validation faild', errors);
-        }
-    }
-
-    // hash password if it exists
-    hashPassword = async (req) => {
-        if (req.body.password) {
-            req.body.password = await bcrypt.hash(req.body.password, 8);
         }
     }
 }

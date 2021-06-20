@@ -4,7 +4,7 @@ const Role = require('../utils/userRoles.utils');
 
 class CardModel {
     tableName = 'card';
-    // idcard, front, back, frontmedia, backmedia, fkdeck
+    // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
 
     find = async (params = {}) => {
         let sql = `SELECT * FROM ${this.tableName}`;
@@ -31,11 +31,13 @@ class CardModel {
         return result[0];
     }
 
-    create = async ({ front, back, frontmedia=null, backmedia=null, fkdeck }) => {
+    create = async ({ front, back, frontmedia=null, backmedia=null, fkdeck, nbreview=1, issuspended=0, difficulty=1, nbdayreview=1, reviewdate=null }) => {
         const sql = `INSERT INTO ${this.tableName}
-        (front, back, frontmedia, backmedia, fkdeck) VALUES (?,?,?,?,?)`;
+        (front, back, frontmedia, backmedia, fkdeck, 
+        nbreview, issuspended, difficulty, nbdayreview, reviewdate) 
+        VALUES (?,?,?,?,?,?,?,?,?,?)`;
 
-        const result = await query(sql, [front, back, frontmedia, backmedia, fkdeck]);
+        const result = await query(sql, [front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate]);
         const affectedRows = result ? result.affectedRows : 0;
 
         return affectedRows;
@@ -51,6 +53,18 @@ class CardModel {
         return result;
     }
 
+    updateReviewDate = async (params, id) => {
+        const { columnSet, values } = multipleColumnSet(params)
+        
+        const sql = `UPDATE card SET ${columnSet}, 
+        reviewdate = (NOW() + INTERVAL ? DAY)
+        WHERE idcard = ?`;
+
+        const result = await query(sql, [...values, params.nbdayreview, id]);
+
+        return result;
+    }
+
     delete = async (id) => {
         const sql = `DELETE FROM ${this.tableName}
         WHERE idcard = ?`;
@@ -61,11 +75,9 @@ class CardModel {
     }
 
     randomReviewCard = async (params) => {
-        // idcard, front, back, frontmedia, backmedia, fkdeck
-        // idreviewcard, nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard
-        const sql = `SELECT * FROM ${this.tableName}
-        INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
-        WHERE card.fkdeck = ? AND reviewcard.reviewdate <= DATE(NOW())
+        // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
+        let sql = `SELECT * FROM ${this.tableName}
+        WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())
         ORDER BY RAND() LIMIT 1`;
 
         const result = await query(sql, [params.fkdeck])
@@ -75,11 +87,9 @@ class CardModel {
     }
 
     reviewCards = async (params) => {
-        // idcard, front, back, frontmedia, backmedia, fkdeck
-        // idreviewcard, nbreview, issuspended, difficulty, nbdayreview, reviewdate, fkcard
+        // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}
-        INNER JOIN reviewcard ON card.idcard = reviewcard.fkcard
-        WHERE card.fkdeck = ? AND reviewcard.reviewdate <= DATE(NOW())`;
+        WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())`;
 
         return await query(sql, [params.fkdeck]);
     }
