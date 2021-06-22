@@ -121,26 +121,65 @@
     })
     $.get('/api/v1/decks/user/'+$('#iduser').attr('name'), (response) => {
         console.log(response)
-        let option = "", accordion = "", card = "";
-        let accordion1 = "<div class='card'><div class='card-header'><h4 class='mb-0'><button class='btn btn-link' type='button' data-toggle='collapse' data-target='#collapseOne' aria-expanded='true' aria-controls='collapseOne'>";
-        let accordion2 = "</button></h4></div><div id='collapseOne' class='collapse show' aria-labelledby='headingOne' data-parent='#accordionDecks'><div class='card-body' id='iddeck";
-        let accordion3 = "'></div></div>";
-        let card1 = "<div class='container-fluid'><div class='row'><div class='col-sm'><div class='card-container'><div class='card'><div class='front'><div class='content'><div class='main'><h4 class='text-center'>";
-        let card2 = "</h4></div></div></div><div class='back'><div class='content'><div class='main'><h4 class='text-center'>";
-        let card3 = "</h4></div></div></div></div></div></div></div></div>";
+        let option = "", accordion = "";
+        
         let listiddeck = [];
         for (let i=0;i<response.length;i++){
             option += "<option value='"+ response[i].iddeck + "'>" + response[i].deckname + "</option>";
             listiddeck.push(response[i].iddeck);
-            accordion += accordion1 + response[i].deckname + accordion2 + response[i].iddeck + accordion3;
+            accordion += `
+                <div class='card'>
+                    <div class='card-header'>
+                        <h4 class='mb-0'>
+                            <button class='btn btn-link' type='button' data-toggle='collapse' data-target='#collapse${response[i].iddeck}' aria-expanded='true' aria-controls='collapse${response[i].iddeck}'>
+                                ${response[i].deckname}
+                            </button>
+                        </h4>
+                    </div>
+                    <div id='collapse${response[i].iddeck}' class='collapse show' aria-labelledby='heading${response[i].iddeck}' data-parent='#accordionDecks'>
+                        <div class='card-body' id='iddeck${response[i].iddeck}'>
+                        </div>
+                    </div>
+                </div>
+            `;
         }
         $("#deckList").append(option);
         $('#accordionDecks').append(accordion);
         for (let i=0; i<listiddeck.length; i++) {
             $.get('/api/v1/cards/deck/'+listiddeck[i], (cards) => {
                 console.log(cards)
+                let card = "";
                 for (let j=0; j < cards.length; j++) {
-                    card += card1 + cards[j].front + card2 + cards[j].back + card3;
+                    card += `
+                        <div class='container-fluid'>
+                            <div class='row'>
+                                <div class='col-sm'>
+                                    <div class='card-container'>
+                                        <div class='card'>
+                                            <div class='front'>
+                                                <div class='content'>
+                                                    <div class='main'>
+                                                        <h4 class='text-center'>
+                                                        ${cards[j].front}    
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class='back'>
+                                                <div class='content'>
+                                                    <div class='main'>
+                                                        <h4 class='text-center'>
+                                                            ${cards[j].back} 
+                                                        </h4>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
                 }
                 $("#iddeck"+listiddeck[i]).append(card);
             })
