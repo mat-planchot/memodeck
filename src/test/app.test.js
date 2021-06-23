@@ -235,19 +235,13 @@ describe ('/api/v1/cards', () => {
                 front: "example"
             });
         idcardex = getNewCard.body.idcard
-        const reviewCards = await request.post('/api/v1/cards/reviewcards')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                fkdeck: iddeck
-            });
+        const reviewCards = await request.get('/api/v1/cards/reviewcards/'+iddeck)
+            .set('Authorization', `Bearer ${token}`);
         expect(reviewCards.status).toBe(200)
     
         // random review card but there is only one this day
-        const reviewCard = await request.post('/api/v1/cards/reviewcard')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                fkdeck: iddeck
-            });
+        const reviewCard = await request.get('/api/v1/cards/reviewcard/'+iddeck)
+            .set('Authorization', `Bearer ${token}`);
         expect(reviewCard.status).toBe(200)
         expect(reviewCard.body.idcard).toBe(idcardex)
 

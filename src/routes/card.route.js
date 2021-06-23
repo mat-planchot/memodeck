@@ -11,8 +11,8 @@ router.get('/', auth(), awaitHandlerFactory(cardController.getAllCards));
 router.get('/id/:id', auth(), awaitHandlerFactory(cardController.getCardById)); // mandatory PARAM idcard
 router.get('/deck/:id', auth(), awaitHandlerFactory(cardController.getAllCardsFromDeck)); // mandatory PARAM fkdeck
 router.patch('/dayreview/:id', auth(), awaitHandlerFactory(cardController.updateReviewDate)); // mandatory POST nbdayreview, idcard
-router.post('/reviewcards', auth(), awaitHandlerFactory(cardController.getReviewCards)); // mandatory POST fkdeck
-router.post('/reviewcard', auth(), awaitHandlerFactory(cardController.getRandomReviewCard)); // mandatory POST fkdeck
+router.get('/reviewcards/:iddeck', auth(), awaitHandlerFactory(cardController.getReviewCards)); // mandatory PARAM fkdeck
+router.get('/reviewcard/:iddeck', auth(), awaitHandlerFactory(cardController.getRandomReviewCard)); // mandatory PARAM fkdeck
 router.post('/front', auth(), frontCardSchema, awaitHandlerFactory(cardController.getCardBy)); // mandatory POST front
 router.post('/back', auth(), backCardSchema, awaitHandlerFactory(cardController.getCardBy)); // mandatory POST back
 router.post('/', auth(), createCardSchema, awaitHandlerFactory(cardController.createCard)); // mandatory POST front, back and fkdeck

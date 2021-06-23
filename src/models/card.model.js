@@ -74,24 +74,24 @@ class CardModel {
         return affectedRows;
     }
 
-    randomReviewCard = async (params) => {
+    randomReviewCard = async (fkdeck) => {
         // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}
         WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())
         ORDER BY RAND() LIMIT 1`;
 
-        const result = await query(sql, [params.fkdeck])
+        const result = await query(sql, [fkdeck])
 
         // return back the first row (card)
         return result[0];
     }
 
-    reviewCards = async (params) => {
+    reviewCards = async (fkdeck) => {
         // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}
         WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())`;
 
-        return await query(sql, [params.fkdeck]);
+        return await query(sql, [fkdeck]);
     }
 }
 

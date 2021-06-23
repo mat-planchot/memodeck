@@ -1,17 +1,3 @@
-<!-- 
-Date.prototype.addDays = function(days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
-    return date;
-}
-
-nbreview = params.nbreview + 1;
-difficulty = params.difficulty + 0.25;
-nbdayreview = Math.round(params.nbdayreview * params.difficulty);
-
-let date = new Date();
-date.addDays(nbdayreview).toISOString().replace(/T.+/,'')
--->
 <%- include('template/header', {title: title}) %> 
 <div id='bodybox'>
     <div id='chatborder'>
@@ -25,10 +11,59 @@ date.addDays(nbdayreview).toISOString().replace(/T.+/,'')
       <input type="text" name="chat" id="chatbox" placeholder="Hi there! Type here to talk to me." onfocus="placeHolder()">
     </div>
 </div>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
-    <script type="text/javascript">
-    //links
+<script type="text/javascript">
+/*
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+nbreview = params.nbreview + 1;
+difficulty = params.difficulty + 0.25;
+nbdayreview = Math.round(params.nbdayreview * params.difficulty);
+
+let date = new Date();
+date.addDays(nbdayreview).toISOString().replace(/T.+/,'')
+*/
+// find iddeck in url
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const iddeck = urlParams.get('iddeck')
+
+// suspended card are not yet supported
+let cards = $.get('/api/v1/cards/deck/'+iddeck);
+let newCards = cards.then((response) => {
+    let newCards = [];
+    response.forEach(card => {
+        if (card.reviewdate === null) {
+            newCards.push(card);
+        }
+    });
+    let str = "<b>Chatbot: </b>"+newCards[0].front;
+    $('#chatlog1').append(str)
+    return newCards
+});
+let reviewCards = cards.then((response) => {
+    let reviewCards = [];
+    response.forEach(card => {
+        if (card.reviewdate !== null && new Date(card.reviewdate).toISOString().replace(/T.+/,'') !== new Date(card.reviewdate).toISOString().replace(/T.+/,'')) {
+            reviewCards.push(card);
+        }
+    })
+    return reviewCards;
+});
+let otherCards = cards.then((response) => {
+    let reviewCards = [];
+    response.forEach(card => {
+        if (new Date(card.reviewdate).toISOString().replace(/T.+/,'') === new Date(card.reviewdate).toISOString().replace(/T.+/,'')) {
+            reviewCards.push(card);
+        }
+    })
+    return reviewCards;
+});
+
+//links
 //http://eloquentjavascript.net/09_regexp.html
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 
@@ -37,23 +72,23 @@ var messages = [], //array that hold the record of each string in chat
   botMessage = "", //var keeps track of what the chatbot is going to say
   botName = 'Chatbot', //name of the chatbot
   talking = true; //when false the speach function doesn't work
-//edit this function to change what the chatbot says
-function chatbotResponse() {
+
+  //edit this function to change what the chatbot says
+async function chatbotResponse() {
   talking = true;
-  botMessage = "I'm confused"; //the default message
+  let cards = await newCards;
+  botMessage = cards[0].front; //the default message
 
-  if (lastUserMessage === 'hi' || lastUserMessage =='hello') {
-    const hi = ['hi','howdy','hello']
-    botMessage = hi[Math.floor(Math.random()*(hi.length))];;
+  if (lastUserMessage === cards[0].back) {
+    botMessage = "<b style='color: green;'>"+cards[0].back+'</b>';
   }
-
-  if (lastUserMessage === 'name') {
-    botMessage = 'My name is ' + botName;
+  else {
+    botMessage = "<b style='color: red;'>"+cards[0].back+'</b>';
   }
 }
 //this runs each time enter is pressed.
 //It controls the overall input and output
-function newEntry() {
+async function newEntry() {
   //if the message from the user isn't empty then run 
   if (document.getElementById("chatbox").value != "") {
     //pulls the value from the chatbox ands sets it to lastUserMessage
@@ -64,11 +99,14 @@ function newEntry() {
     messages.push(lastUserMessage);
     //Speech(lastUserMessage);  //says what the user typed outloud
     //sets the variable botMessage in response to lastUserMessage
-    chatbotResponse();
+    await chatbotResponse();
     //add the chatbot's name and message to the array messages
     messages.push("<b>" + botName + ":</b> " + botMessage);
     // says the message using the text to speech function written below
     Speech(botMessage);
+    let botCard = await newCards;
+    messages.push("<b>" + botName + ":</b> " + botCard[0].front)
+    Speech(botCard[0].front)
     //outputs the last few array elements of messages to html
     for (var i = 1; i < 8; i++) {
       if (messages[messages.length - i])
@@ -114,5 +152,6 @@ function keyPress(e) {
 function placeHolder() {
   document.getElementById("chatbox").placeholder = "";
 }
-    </script>
+
+</script>
 <%- include('template/footer') %> 

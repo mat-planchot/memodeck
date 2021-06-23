@@ -59,7 +59,7 @@ class CardController {
     getRandomReviewCard = async (req, res, next) => {
         this.checkValidation(req);
 
-        const card = await CardModel.randomReviewCard(req.body);
+        const card = await CardModel.randomReviewCard(req.params.iddeck);
 
         if (!card) {
             throw new HttpException(404, 'Card not found');
@@ -69,7 +69,7 @@ class CardController {
     };
 
     getReviewCards = async (req, res, next) => {
-        let cardList = await CardModel.reviewCards(req.body);
+        let cardList = await CardModel.reviewCards(req.params.iddeck);
         if (!cardList.length) {
             throw new HttpException(404, 'Cards not found');
         }

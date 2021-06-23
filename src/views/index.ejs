@@ -8,7 +8,7 @@
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#createDeck">
         Créer un paquet
     </button>
-    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#createCard">
+    <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#createCard">
         Créer une carte
     </button>
     <hr />
@@ -134,6 +134,12 @@
                             <button class='btn btn-link' type='button' data-toggle='collapse' data-target='#collapse${response[i].iddeck}' aria-expanded='true' aria-controls='collapse${response[i].iddeck}'>
                                 ${response[i].deckname}
                             </button>
+                            <a href='/bot?iddeck=${response[i].iddeck}' class='btn btn-success'>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play" viewBox="0 0 16 16">
+                                    <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"></path>
+                                </svg>
+                                Réviser
+                            </a>
                         </h4>
                     </div>
                     <div id='collapse${response[i].iddeck}' class='collapse show' aria-labelledby='heading${response[i].iddeck}' data-parent='#accordionDecks'>
