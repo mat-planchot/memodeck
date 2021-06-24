@@ -20,16 +20,16 @@ const Role = require('../utils/userRoles.utils');
  *  Description of the columns in the database :
  *
  * idcard: number of card
- * front: Questions
- * back: Answers
- * frontmedia: Questions with media
- * backmedia: Answers with media
- * fkdeck:
- * nbreview:
- * issuspended:
- * difficulty:
- * nbdayreview:
- * reviewdate:
+ * front: questions
+ * back: answers
+ * frontmedia: questions with media
+ * backmedia: answers with media
+ * fkdeck: foreing key de id card
+ * nbreview: number of review done
+ * issuspended: card available or not
+ * difficulty: level of difficulty
+ * nbdayreview: number of days before review
+ * reviewdate: date of review
  *
  *
  **/
