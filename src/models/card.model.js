@@ -7,10 +7,9 @@ const Role = require('../utils/userRoles.utils');
 /******************************************************************************
  *                              Card Model
  *
- * An element that contains the data as well as logic related to the data: validation, reading and recording.
- * It contain only a simple value, or a more complex data structure.
+ * An element that contains the data as well as logic related to the data: validation,
+ * reading and recording. It contain only a simple value, or a more complex data structure.
  * This model represents the inserts of new cards, the update or deletion of cards
-
 
  * Steps of all methods :
  *  1. Adding new cards
@@ -19,17 +18,18 @@ const Role = require('../utils/userRoles.utils');
  *
  *  Description of the columns in the database :
  *
- * idcard: number of card
- * front: questions
- * back: answers
- * frontmedia: questions with media
- * backmedia: answers with media
- * fkdeck: foreing key de id card
- * nbreview: number of review done
- * issuspended: card available or not
- * difficulty: level of difficulty
- * nbdayreview: number of days before review
- * reviewdate: date of review
+ * idcard: number of card [INT]
+ * front: questions [TEXT]
+ * back: answers [TEXT]
+ * frontmedia: media (eg image, video, sound) for the front side of the card [TEXT]
+ * backmedia: answers with media [TEXT]
+ * fkdeck: foreign key that references the deck [INT]
+ * nbreview: number of review done [INT]
+ * issuspended: if the card is suspended it is true (1) [BOOLEAN]
+ * difficulty: float number that decides the next review date by doing a multiplication
+  with the nbdayreview . difficulty * nbdayreview = new nbdayreview and we determine the new review date [FLOAT]
+ * nbdayreview: interval of days to the next review [INT]
+ * reviewdate: date of review [DATE]
  *
  *
  **/
