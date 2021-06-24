@@ -5,11 +5,11 @@ const bcrypt = require('bcryptjs');
 const dotenv = require('dotenv');
 dotenv.config();
 
-/**
+/******************************************************************************
  *                              Card Controller
  *
- * The card controller receives the input from the routes, optionally
- * validates it and then passes the input to the model.
+ * The card controller receives the input from the routes, optionally validates 
+ * it and then passes the input to the model.
  *
  * All methods have this three parameters
  * @param req for request
@@ -25,23 +25,25 @@ dotenv.config();
 class CardController {
 
      /**
-     * return a list of all the cards for a user
+     * get all the cards in the database
      */
-    getAllCards = async (req, res, next) => { // async and await function allow to do some asynchrone request
+    getAllCards = async (req, res, next) => { 
+        // async should be put in front of a function declaration to expect 
+        // the possibility of the await keyword being used to invoke 
+        // asynchronous code
         let cardList = await CardModel.find();
-        if (!cardList.length) { // verified that list of cards is not empty
-            throw new HttpException(404, 'Cards not found'); // return an error if the condition was false
+        // if the list of cards is empty
+        // throw an error with not found status "404"
+        if (!cardList.length) { 
+            throw new HttpException(404, 'Cards not found'); 
         }
-
-        cardList = cardList.map(card => { // map function transform object to array
-            return card;
-        });
 
         res.send(cardList); // return a list of cards
     };
 
     /**
-     * return all cards related to deck
+     * get all cards from a deck
+     * @param req.params.id id of a deck
      */
     getAllCardsFromDeck = async (req, res, next) => {
         let cardList = await CardModel.find({ fkdeck: req.params.id });
@@ -50,15 +52,12 @@ class CardController {
             throw new HttpException(404, 'Cards not found');
         }
 
-        cardList = cardList.map(card => {
-            return card;
-        });
-
         res.send(cardList);
     };
 
     /**
-     * return card by param id
+     * get card by its id
+     * @param req.params.id id of a card
      */
     getCardById = async (req, res, next) => {
         const card = await CardModel.findOne({ idcard: req.params.id });
@@ -71,11 +70,15 @@ class CardController {
     };
 
     /**
-     * return card by param body
+     * get card by a body parameter
+     * @param req.body
      */
     getCardBy = async (req, res, next) => {
+        // check to limit to a single parameter 
+        // in the case of routes /front and /back
         this.checkValidation(req);
 
+        // findOne
         const card = await CardModel.findOne(req.body);
 
         if (!card) {
@@ -86,7 +89,8 @@ class CardController {
     };
 
     /**
-     * return card at current date by random selection
+     * get a random daily review card from a deck
+     * @param req.params.iddeck id of a deck
      */
     getRandomReviewCard = async (req, res, next) => {
         this.checkValidation(req);
@@ -101,7 +105,8 @@ class CardController {
     };
 
     /**
-     * return all cards at current date
+     * get all daily review cards from a deck
+     * @param req.param.iddeck id of a deck
      */
     getReviewCards = async (req, res, next) => {
         let cardList = await CardModel.reviewCards(req.params.iddeck);
@@ -109,39 +114,33 @@ class CardController {
             throw new HttpException(404, 'Cards not found');
         }
 
-        cardList = cardList.map(card => {
-            return card;
-        });
-
         res.send(cardList);
     };
 
     /**
-     * Allow to create a card
+     * Create a card with the body parameters
+     * @param req.body
      */
     createCard = async (req, res, next) => {
-        this.checkValidation(req); // check the datas send it is correct in the function
-
-        const result = await CardModel.create(req.body); // creation of the card
+        // check the datas send it is correct in the function
+        this.checkValidation(req); 
+        // creation of the card
+        const result = await CardModel.create(req.body); 
 
         if (!result) {
             throw new HttpException(500, 'Something went wrong');
         }
-
-        res.status(201).send('Card was created!'); // return a message with code status 201 for created card
+        // return a message with code status 201 for created card
+        res.status(201).send('Card was created!'); 
     };
 
     /**
-     * Allow to update card
-     * @param req
-     * @param res
-     * @param next
-     * @returns {Promise<void>}
+     * Update a card from its URL id parameter and body parameters
+     * @param req.param.id
+     * @param req.body
      */
     updateCard = async (req, res, next) => {
         this.checkValidation(req);
-
-        //await this.hashPassword(req);
 
         const { confirm_password, ...restOfUpdates } = req.body;
 
@@ -161,6 +160,11 @@ class CardController {
         res.send({ message, info });
     };
 
+    /**
+     * Update the review date of card from its URL id parameter and body parameters
+     * @param req.param.id
+     * @param req.body
+     */
     updateReviewDate = async (req, res, next) => {
         // do the update query and get the result
         const result = await CardModel.updateReviewDate(req.body, req.params.id);
@@ -178,7 +182,8 @@ class CardController {
     };
 
     /**
-     * Allow to delete a one card
+     * Delete a card from its id
+     * @param req.param.id
      */
     deleteCard = async (req, res, next) => {
         const result = await CardModel.delete(req.params.id);
@@ -188,6 +193,10 @@ class CardController {
         res.send('Card has been deleted');
     };
 
+    /**
+     * Some function are protected by this function which checks
+     * the parameters sent in the request
+     */
     checkValidation = (req) => {
         const errors = validationResult(req)
         if (!errors.isEmpty()) {
