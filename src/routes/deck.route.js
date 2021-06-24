@@ -8,6 +8,7 @@ const { createDeckSchema, updateDeckSchema } = require('../middleware/validators
 
 // localhost:3000/api/v1/decks/...
 router.get('/', auth(), awaitHandlerFactory(deckController.getAllDecks));
+router.get('/user/:iduser', auth(), awaitHandlerFactory(deckController.getDecksFromUser)); // mandatory PARAM iduser
 router.get('/:iddeck/user/:iduser', auth(), awaitHandlerFactory(deckController.getAllCardsFromDeckUser)); // mandatory PARAM iddeck and iduser
 router.get('/id/:id', auth(), awaitHandlerFactory(deckController.getDeckById)); // mandatory PARAM iddeck
 router.get('/deckname/:deckname', auth(), awaitHandlerFactory(deckController.getDeckBydeckName)); // mandatory PARAM deckname

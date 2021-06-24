@@ -19,7 +19,7 @@ class DeckModel {
 
     findCards = async (params = {}) => {
         // iddeck, deckname, fkuser
-        // idcard, front, back, frontmedia, backmedia, fkdeck
+        // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}
         INNER JOIN card ON card.fkdeck = deck.iddeck
         WHERE deck.iddeck = ? AND deck.fkuser = ?`
