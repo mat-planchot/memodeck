@@ -18,16 +18,16 @@ const Role = require('../utils/userRoles.utils');
  *
  *  Description of the columns in the database :
  *
- * idcard: number of card [INT]
+ * idcard: identifiant of the card [INT]
  * front: questions [TEXT]
  * back: answers [TEXT]
  * frontmedia: media (eg image, video, sound) for the front side of the card [TEXT]
- * backmedia: answers with media [TEXT]
+ * backmedia: media (eg image, video, sound) for the back side of the card [TEXT]
  * fkdeck: foreign key that references the deck [INT]
  * nbreview: number of review done [INT]
  * issuspended: if the card is suspended it is true (1) [BOOLEAN]
  * difficulty: float number that decides the next review date by doing a multiplication
-  with the nbdayreview . difficulty * nbdayreview = new nbdayreview and we determine the new review date [FLOAT]
+  with the nbdayreview . difficulty * nbdayreview = new nbdayreview and we determine the new review date [FLOAT(6,2)]
  * nbdayreview: interval of days to the next review [INT]
  * reviewdate: date of review [DATE]
  *
