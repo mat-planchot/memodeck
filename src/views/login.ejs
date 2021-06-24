@@ -29,7 +29,8 @@
                     contentType: "application/json; charset=utf-8",
                     success(json){
                         if(json){
-                            console.log(json)
+                            console.log(json);
+                            $(location).attr('http://localhost:3000/');
                         }
                     }
                 });

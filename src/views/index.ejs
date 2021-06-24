@@ -5,13 +5,6 @@
     </div>
     <h3>Bonjour <%= session.username %></h3>
     <div>
-        <table>
-            <tr>
-                <th data-field="id">idcard</th>
-                <th data-field="name" data-sortable="true">front</th>
-                <th data-field="salary" data-sortable="true">back</th>
-            </tr>
-        </table>
         <h1>Ajouter un paquet</h1>
         <form id="create_deck" action="/api/v1/decks" method="POST">
             <label for="front">Nom du paquet :</label>
@@ -29,7 +22,9 @@
             <br>
             <label for="deck">Paquet :</label>
             <select name="deck" id="deck">
-                <option>--------------</option>
+                <% deck.forEach({ %> 
+                    <option value="<% deck.deckname %>"><% deck.deckname %></option>
+                <% )}; %>
             </select>
             <br>
             <input type="submit" value="ajouter">
@@ -39,6 +34,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>
     <script type="text/javascript">
         $(document).ready(function() {
+
             $('#create_deck').submit(function(event) {
 
                 event.preventDefault();
@@ -50,6 +46,7 @@
                     fkuser : $('input[name=iduser]').val()
                 }
                 console.log(JSON.stringify(formData));
+
                 $.ajax({
                     url: route,
                     type: 'POST',
@@ -64,6 +61,38 @@
                 });
 
             });
+
+            $('#create_card').submit(function(event){
+
+                event.preventDefault();
+
+                const route = $('#create_card').attr('action');
+                console.log("route: "+ route)
+                let formData = {
+                    front : $('input[name=front]').val(),
+                    back : $('input[name=back]').val(),
+                    fkdeck : $('select[name=deck]').val()
+                }
+                console.log(JSON.stringify(formData));
+
+                $.ajax({
+                    url: route,
+                    type: 'POST',
+                    data: JSON.stringify(formData),
+                    dataType: 'json',
+                    contentType: "application/json; charset=utf-8",
+                    success(json){
+                        if(json){
+                            console.log(json)
+                        }
+                    }
+                });
+
+            });
+
+            function updateDeck(){
+                let route = "/api/v1/decks";
+            }
         });
     </script>
 <%- include('template/footer') %> 

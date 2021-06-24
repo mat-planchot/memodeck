@@ -22,18 +22,15 @@
     <script type="text/javascript">
         $(document).ready(function() {
             $('#form_sign').submit(function(event) {
-
+                
                 event.preventDefault();
-
                 const route = $('#form_sign').attr('action');
-                console.log("route: "+ route)
                 let formData = {
                     username : $('input[name=username]').val(),
                     email : $('input[name=email]').val(),
                     password : $('input[name=password]').val(),
                     confirm_password : $('input[name=confirm_password]').val()
                 }
-                console.log(JSON.stringify(formData));
                 $.ajax({
                     url: route,
                     type: 'POST',
@@ -42,7 +39,8 @@
                     contentType: "application/json; charset=utf-8",
                     success(json){
                         if(json){
-                            console.log(json)
+                            console.log(json);
+                            window.location.href = "http://localhost:3000/login"
                         }
                     }
                 });
