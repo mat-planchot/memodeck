@@ -40,7 +40,7 @@ let newCards = cards.then((response) => {
             newCards.push(card);
         }
     });
-    let str = "<b>Chatbot: </b>"+newCards[0].front;
+    let str = "<img src='img/botavatar.png' alt='Chatbot' class='avatar' /> "+newCards[0].front;
     $('#chatlog1').append(str)
     return newCards
 });
@@ -67,52 +67,61 @@ let otherCards = cards.then((response) => {
 //http://eloquentjavascript.net/09_regexp.html
 //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
 
-var messages = [], //array that hold the record of each string in chat
+let messages = [], //array that hold the record of each string in chat
   lastUserMessage = "", //keeps track of the most recent input string from the user
   botMessage = "", //var keeps track of what the chatbot is going to say
+  botavatar = "<img src='img/botavatar.png' alt='Chatbot' class='avatar' /> ",
   botName = 'Chatbot', //name of the chatbot
-  talking = true; //when false the speach function doesn't work
+  talking = true
+  countCard = 0; //when false the speach function doesn't work
 
   //edit this function to change what the chatbot says
-async function chatbotResponse() {
+function chatbotResponse(cards) {
   talking = true;
-  let cards = await newCards;
   botMessage = cards[0].front; //the default message
 
-  if (lastUserMessage === cards[0].back) {
-    botMessage = "<b style='color: green;'>"+cards[0].back+'</b>';
+  if (lastUserMessage === cards[countCard].back) {
+    botMessage = "<b style='color: green;'>"+cards[countCard].back+'</b>';
   }
   else {
-    botMessage = "<b style='color: red;'>"+cards[0].back+'</b>';
+    botMessage = "<b style='color: red;'>"+cards[countCard].back+'</b>';
   }
 }
 //this runs each time enter is pressed.
 //It controls the overall input and output
 async function newEntry() {
   //if the message from the user isn't empty then run 
-  if (document.getElementById("chatbox").value != "") {
-    //pulls the value from the chatbox ands sets it to lastUserMessage
-    lastUserMessage = document.getElementById("chatbox").value;
-    //sets the chat box to be clear
-    document.getElementById("chatbox").value = "";
-    //adds the value of the chatbox to the array messages
-    messages.push(lastUserMessage);
-    //Speech(lastUserMessage);  //says what the user typed outloud
-    //sets the variable botMessage in response to lastUserMessage
-    await chatbotResponse();
-    //add the chatbot's name and message to the array messages
-    messages.push("<b>" + botName + ":</b> " + botMessage);
-    // says the message using the text to speech function written below
-    Speech(botMessage);
-    let botCard = await newCards;
-    messages.push("<b>" + botName + ":</b> " + botCard[0].front)
-    Speech(botCard[0].front)
-    //outputs the last few array elements of messages to html
-    for (var i = 1; i < 8; i++) {
-      if (messages[messages.length - i])
-        document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
+    if (document.getElementById("chatbox").value != "") {
+        let botCards = await newCards;
+        if (countCard === 0) {
+            messages.push(botavatar + botCards[countCard].front)
+        }
+        //pulls the value from the chatbox ands sets it to lastUserMessage
+        lastUserMessage = document.getElementById("chatbox").value;
+        //sets the chat box to be clear
+        document.getElementById("chatbox").value = "";
+        //adds the value of the chatbox to the array messages
+        messages.push("<p class='text-right'>"+lastUserMessage + " <img src='img/useravatar.png' class='avatar' /></p>");
+        //Speech(lastUserMessage);  //says what the user typed outloud
+        //sets the variable botMessage in response to lastUserMessage
+        chatbotResponse(botCards);
+        //add the chatbot's name and message to the array messages
+        messages.push(botavatar + botMessage);
+        // says the message using the text to speech function written below
+        Speech(botMessage);
+        if (countCard < (botCards.length-1)) {
+            countCard++;
+            messages.push(botavatar + botCards[countCard].front)
+            Speech(botCards[countCard].front)
+        } else if (countCard === (botCards.length-1)) {
+            messages.push(botavatar + "Vous avez fini la révision, revenir à <a href='/'>l'accueil</a>")
+        }
+        //outputs the last few array elements of messages to html
+        for (var i = 1; i < 8; i++) {
+            if (messages[messages.length - i])
+                document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
+        }
     }
-  }
 }
 
 //text to Speech

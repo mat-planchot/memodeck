@@ -36,6 +36,11 @@ body {
   .chatlog {
      font: 15px arial, sans-serif;
   }
+
+  .avatar {
+    width: 50px;
+    height: 50px;
+  }
   
   #chatbox {
     font: 17px arial, sans-serif;
