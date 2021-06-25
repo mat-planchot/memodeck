@@ -7,41 +7,42 @@ const Role = require('../utils/userRoles.utils');
 /******************************************************************************
  *                              Card Model
  *
- * An element that contains the data as well as logic related to the data: validation,
- * reading and recording. It contain only a simple value, or a more complex data structure.
- * This model represents the inserts of new cards, the update or deletion of cards
-
- * Steps of all methods :
- *  1. Adding new cards
- *  2. Update cards
- *  3. Removal of cards
+ * CardModel is a class that contains the logic related to the data: 
+ * get, create update and remove cards. 
+ * 
+ * This class contains methods to :
+ *  1. Get a card or a list of cards: find, findOne, randomReviewCard, reviewCards
+ *  2. Add a new card: create
+ *  3. Update a card: update, updateReviewDate
+ *  4. Remove a card: delete
  *
  *  Description of the columns in the database :
  *
- * idcard: identifiant of the card [INT]
- * front: questions [TEXT]
- * back: answers [TEXT]
- * frontmedia: media (eg image, video, sound) for the front side of the card [TEXT]
- * backmedia: media (eg image, video, sound) for the back side of the card [TEXT]
- * fkdeck: foreign key that references the deck [INT]
- * nbreview: number of review done [INT]
- * issuspended: if the card is suspended it is true (1) [BOOLEAN]
- * difficulty: float number that decides the next review date by doing a multiplication
-  with the nbdayreview . difficulty * nbdayreview = new nbdayreview and we determine the new review date [FLOAT(6,2)]
- * nbdayreview: interval of days to the next review [INT]
- * reviewdate: date of review [DATE]
+ * @param idcard [INT]: identifier of the card
+ * @param front [TEXT]: front side of the card used to put the question
+ * @param back [TEXT]: front side of the card used to put the answer
+ * @param frontmedia [TEXT]: media (eg image, video, sound) for the front side of the card
+ * @param backmedia [TEXT]: media (eg image, video, sound) for the back side of the card
+ * @param fkdeck [INT]: foreign key that references the deck
+ * @param nbreview [INT]: number of review done
+ * @param issuspended [BOOLEAN]: if the card is suspended it is true (1) 
+ * @param difficulty [FLOAT(6,2)]: float number that decides the next review date 
+ * by doing a multiplication with the nbdayreview. 
+ * difficulty * nbdayreview = new nbdayreview and we determine the new review date 
+ * @param nbdayreview [INT]: interval of days to the next review
+ * @param reviewdate [DATE]: date of review 
  *
  *
  **/
 
 
 class CardModel {
-    tableName = 'card'; /** TABLE NAME **/
+    tableName = 'card';
     /**
-     * get all the cards in the database with this data: idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
+     * get all the cards in the database 
      */
-
     find = async (params = {}) => {
+        // select columns: idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}`;
 
         if (!Object.keys(params).length) {
@@ -57,6 +58,7 @@ class CardModel {
     findOne = async (params) => {
         const { columnSet, values } = multipleColumnSet(params)
 
+        // select columns: idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         const sql = `SELECT * FROM ${this.tableName}
         WHERE ${columnSet}`;
 
@@ -98,6 +100,7 @@ class CardModel {
     update = async (params, id) => {
         const { columnSet, values } = multipleColumnSet(params)
 
+        // columnSet for partial edit
         const sql = `UPDATE card SET ${columnSet} WHERE idcard = ?`;
 
         const result = await query(sql, [...values, id]);
@@ -112,6 +115,7 @@ class CardModel {
     updateReviewDate = async (params, id) => {
         const { columnSet, values } = multipleColumnSet(params)
 
+        // it can be partial edit but it must contain the number of days to the next review (nbdayreview)
         const sql = `UPDATE card SET ${columnSet}, 
         reviewdate = (NOW() + INTERVAL ? DAY)
         WHERE idcard = ?`;
@@ -137,14 +141,16 @@ class CardModel {
      * @param fkdeck id of a deck
      */
     randomReviewCard = async (fkdeck) => {
-        // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
+        // select columns: idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
+        // the review date have to be before or the current day
+        // limit to one row (equal one card) order by the randomization of the current query
         let sql = `SELECT * FROM ${this.tableName}
         WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())
         ORDER BY RAND() LIMIT 1`;
 
         const result = await query(sql, [fkdeck])
 
-        // return back the first row (card)
+        // return the first row, the only card of the sql request
         return result[0];
     }
     /**
@@ -152,7 +158,7 @@ class CardModel {
      * @param fkdeck id of a deck
      */
     reviewCards = async (fkdeck) => {
-        // idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
+        // select columns: idcard, front, back, frontmedia, backmedia, fkdeck, nbreview, issuspended, difficulty, nbdayreview, reviewdate
         let sql = `SELECT * FROM ${this.tableName}
         WHERE card.fkdeck = ? AND reviewdate <= DATE(NOW())`;
 
