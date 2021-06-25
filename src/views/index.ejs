@@ -46,16 +46,28 @@
                 </div>
                 <form id="create_card" action="/api/v1/cards" method="POST">
                     <div class="modal-body">
-                        <label for="front">Question :</label>
-                        <input type="text" name="front" id="front">
-                        <br>
-                        <label for="back">Réponse :</label>
-                        <input type="text" name="back" id="back">
-                        <br>
-                        <label for="deck">Paquet :</label>
-                        <select name="deck" id="deckList">
-                            <option>--------------</option>
-                        </select>
+                        <div class="form-group">
+                            <label for="front">Recto :</label>
+                            <input type="text" name="front" class="form-control" id="front">
+                        </div>
+                        <div class="form-group">
+                            <label for="back">Verso :</label>
+                            <input type="text" name="back" class="form-control" id="back">
+                        </div>
+                        <div class="form-group">
+                            <label for="frontmedia">Média recto (html) :</label>
+                            <input type="text" name="frontmedia" class="form-control" id="frontmedia">
+                        </div>
+                        <div class="form-group">
+                            <label for="backmedia">Média verso (html) :</label>
+                            <input type="text" name="backmedia" class="form-control" id="backmedia">
+                        </div>
+                        <div class="form-group">
+                            <label for="deck">Paquet :</label>
+                            <select name="deck" class="form-control" id="deckList">
+                                <option>--------------</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <input type="submit" class="btn btn-primary" value="ajouter" />
@@ -102,7 +114,9 @@
         console.log("route: "+ route)
         let formData = { 
             front: $('input[name=front]').val(), 
-            back: $('input[name=back]').val(), 
+            back: $('input[name=back]').val(),
+            frontmedia: $('input[name=frontmedia]').val(), 
+            backmedia: $('input[name=backmedia]').val(), 
             fkdeck: $('select[name=deck]').val()
         }
         console.log(formData)
@@ -134,7 +148,7 @@
                             <button class='btn btn-link' type='button' data-toggle='collapse' data-target='#collapse${response[i].iddeck}' aria-expanded='true' aria-controls='collapse${response[i].iddeck}'>
                                 ${response[i].deckname}
                             </button>
-                            <a href='/bot?iddeck=${response[i].iddeck}' class='btn btn-success'>
+                            <a href='/bot?iddeck=${response[i].iddeck}' class='btn btn-success float-right'>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play" viewBox="0 0 16 16">
                                     <path d="M10.804 8 5 4.633v6.734L10.804 8zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696l6.363 3.692z"></path>
                                 </svg>
@@ -157,28 +171,30 @@
                 let card = "";
                 for (let j=0; j < cards.length; j++) {
                     card += `
-                        <div class='container-fluid'>
-                            <div class='row'>
-                                <div class='col-sm'>
-                                    <div class='card-container'>
-                                        <div class='card'>
-                                            <div class='front'>
-                                                <div class='content'>
-                                                    <div class='main'>
-                                                        <h4 class='text-center'>
-                                                        ${cards[j].front}    
-                                                        </h4>
-                                                    </div>
-                                                </div>
+                        <div class='col-sm'>
+                            <div class='card-container'>
+                                <div class='card'>
+                                    <div class='front'>
+                                        <div class='content'>
+                                            <div class='main'>
+                                                <h4 class='text-center'>
+                                                    ${cards[j].front}    
+                                                </h4>
+                                                <p class='text-center'>
+                                                    ${cards[j].frontmedia === null ? '' : cards[j].frontmedia}
+                                                </p>
                                             </div>
-                                            <div class='back'>
-                                                <div class='content'>
-                                                    <div class='main'>
-                                                        <h4 class='text-center'>
-                                                            ${cards[j].back} 
-                                                        </h4>
-                                                    </div>
-                                                </div>
+                                        </div>
+                                    </div>
+                                    <div class='back'>
+                                        <div class='content'>
+                                            <div class='main'>
+                                                <h4 class='text-center'>
+                                                    ${cards[j].back} 
+                                                </h4>
+                                                <p class='text-center'>
+                                                    ${cards[j].backmedia === null ? '' : cards[j].backmedia}
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
@@ -187,7 +203,14 @@
                         </div>
                     `;
                 }
-                $("#iddeck"+listiddeck[i]).append(card);
+                let cardcontainer = `
+                    <div class='container-fluid'>
+                        <div class='row'>
+                            ${card} 
+                        </div>
+                    </div>
+                `;
+                $("#iddeck"+listiddeck[i]).append(cardcontainer);
             })
         }
     })
