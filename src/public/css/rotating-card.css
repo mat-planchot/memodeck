@@ -119,12 +119,7 @@ body {
     box-shadow: none;
     padding: 10px 20px 20px;
 }
-.card .content .main {
-    min-height: 160px;
-}
-.card .back .content .main {
-    height: 215px;
-}
+
 .card .name {
     font-size: 22px;
     line-height: 28px;
@@ -137,7 +132,7 @@ body {
     font-weight: 400;
     line-height: 20px;
 }
-.card .profession{
+.card .profession {
     color: #999999;
     text-align: center;
     margin-bottom: 20px;
@@ -145,8 +140,6 @@ body {
 .card .footer {
     border-top: 1px solid #EEEEEE;
     color: #999999;
-    margin: 30px 0 0;
-    padding: 10px 0 0;
     text-align: center;
 }
 .card .footer .social-links{
@@ -159,8 +152,7 @@ body {
     margin-top: -6px;
 }
 .card .header {
-    padding: 15px 20px;
-    height: 90px;
+    border-bottom: 1px solid #EEEEEE;
 }
 .card .motto{
     border-bottom: 1px solid #EEEEEE;
@@ -181,7 +173,10 @@ body {
 	width: 33.333333%;
 	text-align: center;
 }
-
+.card img {
+    max-width: 150px;
+    max-height: 150px;
+}
 .card .stats:first-child{
 	border-right: 1px solid #EEEEEE;
 }

@@ -1,0 +1,58 @@
+<%- include('template/header', {title: title}) %>
+<div class="container">
+    <h2 class="text-center">Modification de la carte</h2>
+    <hr>
+    <form id="update_card" action="/api/v1/cards/id/<%= idcard %>" method="POST">
+        <div class="form-body">
+            <div class="form-group">
+                <label for="front">Recto :</label>
+                <input value="<%= card.front %>" type="text" name="front" class="form-control" id="front">
+            </div>
+            <div class="form-group">
+                <label for="back">Verso :</label>
+                <input value="<%= card.back %>" type="text" name="back" class="form-control" id="back">
+            </div>
+            <div class="form-group">
+                <label for="frontmedia">Média recto (html) :</label>
+                <input value="<%= card.frontmedia %>" type="text" name="frontmedia" class="form-control" id="frontmedia">
+            </div>
+            <div class="form-group">
+                <label for="backmedia">Média verso (html) :</label>
+                <input value="<%= card.backmedia %>" type="text" name="backmedia" class="form-control" id="backmedia">
+            </div>
+        </div>
+        <div class="form-footer text-center">
+            <input type="submit" class="btn btn-primary" value="modifier" />
+        </div>
+    </form>
+</div><!-- end container -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#update_card').submit(function(event) {
+            event.preventDefault();
+            const route = $('#update_card').attr('action');
+            console.log("route: "+ route)
+            let formData = {
+                front : $('input[name=front]').val(),
+                back : $('input[name=back]').val(),
+                frontmedia : $('input[name=frontmedia]').val(),
+                backmedia : $('input[name=backmedia]').val()
+            }
+            console.log(JSON.stringify(formData));
+            $.ajax({
+                url: route,
+                type: 'PATCH',
+                data: JSON.stringify(formData),
+                dataType: 'json',
+                contentType: "application/json; charset=utf-8",
+                success(json){
+                    if(json){
+                        console.log(json)
+                    }
+                }
+            });
+
+        })
+    });
+</script>
+<%- include('template/footer') %> 

@@ -29,15 +29,7 @@ exports.createCardSchema = [
         .exists()
         .withMessage('Back is required')
         .isLength({ min: 1 })
-        .withMessage('Must not be empty'),
-    body('frontmedia')
-        .optional()
-        .isLength({ min: 1 })
-        .withMessage('Must not be empty'),
-    body('backmedia')
-        .optional()
-        .isLength({ min: 1 })
-        .withMessage('Must not be empty'),
+        .withMessage('Must not be empty')
 ];
 
 exports.updateCardSchema = [
@@ -46,14 +38,6 @@ exports.updateCardSchema = [
         .isLength({ min: 1 })
         .withMessage('Must not be empty'),
     body('back')
-        .optional()
-        .isLength({ min: 1 })
-        .withMessage('Must not be empty'),
-    body('frontmedia')
-        .optional()
-        .isLength({ min: 1 })
-        .withMessage('Must not be empty'),
-    body('backmedia')
         .optional()
         .isLength({ min: 1 })
         .withMessage('Must not be empty'),

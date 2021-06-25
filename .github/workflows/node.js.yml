@@ -19,22 +19,18 @@ jobs:
         node-version: [12.x, 14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     
+    env:
+      DB_DATABASE: epsi
+      DB_USER: root
+      DB_PASSWORD: root
+
     steps:
     - uses: actions/checkout@v2
-    - name: Shutdown Ubuntu MySQL (SUDO)
-      run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-
-    - # ... some steps before set-up MySQL ...
-    - name: Set up MariaDB
-      uses: getong/mariadb-action@v1.1
-      with:
-        mysql database: 'epsi' # Optional, default value is "test". The specified database which will be create
-        mysql user: 'epsi' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Can use secrets, too
-        mysql password: ${{ secrets.DatabasePassword }} # Required if "mysql user" exists. The password for the "mysql user"
-    - name: Verify MariaDB connection
+    - name: Set up MySQL
       run: |
-        mysql --host 0.0.0.0 --port 3306 -u epsi -p${{ secrets.DatabasePassword }} < src/db/create-db.sql
-        mysql --host 0.0.0.0 --port 3306 -u epsi -p${{ secrets.DatabasePassword }} -e "SHOW DATABASES"
+        sudo /etc/init.d/mysql start
+        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
+        mysql -u ${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} < src/db/create-db.sql
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
@@ -42,8 +38,8 @@ jobs:
       env:
         DB_HOST: mysql
         DB_DATABASE: epsi
-        DB_USER: epsi
-        DB_PASS: ${{ secrets.DatabasePassword }}
+        DB_USER: ${{ env.DB_USER }}
+        DB_PASS: ${{ env.DB_PASSWORD }}
         SECRET_JWT: supersecret
         PORT: 3000
     - run: npm ci
