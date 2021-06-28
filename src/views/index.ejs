@@ -70,7 +70,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <input type="submit" class="btn btn-primary" value="ajouter" />
+                        <input type="submit" class="btn btn-primary"  value="ajouter" />
                     </div>
                 </form>
             </div>
@@ -101,7 +101,9 @@
                 contentType: "application/json; charset=utf-8",
                 success(json){
                     if(json){
-                        console.log(json)
+                        console.log(json);
+                        $('#createDeck').hide();
+                        window.location.reload;
                     }
                 }
             });
@@ -128,7 +130,8 @@
             contentType: "application/json; charset=utf-8",
             success(json){
                 if(json){
-                    console.log(json)
+                    console.log(json);
+                    window.location.redirect = 'http://localhost:3000/';
                 }
             }
         });
