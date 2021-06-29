@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS deck
     iddeck        INT PRIMARY KEY auto_increment, 
     deckname      VARCHAR(25) NOT NULL, 
     fkuser        INT NOT NULL,
-    FOREIGN KEY (fkuser) REFERENCES user(iduser)
+    FOREIGN KEY (fkuser) REFERENCES user(iduser) ON DELETE CASCADE
   ); 
 
 DROP TABLE IF EXISTS card;
@@ -38,6 +38,6 @@ CREATE TABLE IF NOT EXISTS card
     difficulty    FLOAT(6,2) NOT NULL DEFAULT 1,
     nbdayreview   INT NOT NULL DEFAULT 1,
     reviewdate    DATE DEFAULT NULL,
-    FOREIGN KEY (fkdeck) REFERENCES deck(iddeck)
+    FOREIGN KEY (fkdeck) REFERENCES deck(iddeck) ON DELETE CASCADE
   );
 
