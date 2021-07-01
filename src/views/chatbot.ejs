@@ -18,156 +18,163 @@
 </div>
 
 <script type="text/javascript">
-    /*
-    Date.prototype.addDays = function(days) {
-        var date = new Date(this.valueOf());
-        date.setDate(date.getDate() + days);
-        return date;
+// find iddeck in url
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+const iddeck = urlParams.get('iddeck')
+let messages = [], //array that hold the record of each string in chat
+    lastUserMessage = "", //keeps track of the most recent input string from the user
+    botMessage = "", //var keeps track of what the chatbot is going to say
+    botavatar = "<img src='img/botavatar.png' alt='Chatbot' class='avatar' /> ",
+    botName = 'Chatbot', //name of the chatbot
+    talking = true, //when false the speach function doesn't work
+    color,
+    botCard,
+    countReviewCard = 0,
+    countNewCard = 0; 
+
+const ejscards = <%-JSON.stringify(cards)%>;
+
+let reviewCards = [], newCards = [], cards = {};
+ejscards.forEach(card => {
+    if (card.reviewdate !== null && new Date(card.reviewdate) <= new Date()) 
+    {
+        reviewCards.push(card);
+        cards.reviewcards = reviewCards;
     }
+    if (card.reviewdate === null) {
+        newCards.push(card);
+        cards.newcards = newCards;
+    }
+})
+if (cards.reviewcards !== undefined && cards.reviewcards.length > 0) {
+    let str = botavatar + cards.reviewcards[0].front;
+    $('#chatlog1').append(str)
+    Speech(cards.reviewcards[0].front, 'fr');
+}
+if (cards.reviewcards=== undefined && cards.newcards !== undefined && cards.newcards.length > 0) {
+    let str = botavatar + cards.newcards[0].front;
+    $('#chatlog1').append(str)
+    Speech(cards.newcards[0].front, 'fr');
+}
 
-    nbreview = params.nbreview + 1;
-    difficulty = params.difficulty + 0.25;
-    nbdayreview = Math.round(params.nbdayreview * params.difficulty);
+//edit this function to change what the chatbot says
+function chatbotResponse(card) {
+    talking = true;
+    let formData;
+    if (lastUserMessage === card.back) {
+        color = 'green';
+        formData = {
+            nbreview: card.nbreview + 1,
+            difficulty: card.nbdayreview + 0.25, // good answer
+            nbdayreview: Math.round(card.nbdayreview * card.difficulty)
+        }
+    } else {
+        color = 'red';
+        formData = {
+            nbreview: card.nbreview + 1,
+            difficulty: card.nbdayreview + 0.15, // bad answer
+            nbdayreview: Math.round(card.nbdayreview * card.difficulty)
+        }
+    }
+    $.ajax({
+        url: '/api/v1/cards/dayreview/'+card.idcard,
+        type: 'PATCH',
+        data: JSON.stringify(formData),
+        dataType: 'json',
+        contentType: "application/json; charset=utf-8",
+        complete(json){
+            console.log(json)
+        }
+    })
+}
 
-    let date = new Date();
-    date.addDays(nbdayreview).toISOString().replace(/T.+/,'')
-    */
-    // find iddeck in url
-    const queryString = window.location.search;
-    const urlParams = new URLSearchParams(queryString);
-    const iddeck = urlParams.get('iddeck')
+//this runs each time enter is pressed.
+//It controls the overall input and output
+async function newEntry() {
+    //if the message from the user isn't empty then run
+    if (document.getElementById("chatbox").value != "") {
 
-    // suspended card are not yet supported
-    let cards = $.get('/api/v1/cards/deck/'+iddeck);
-    let newCards = cards.then((response) => {
-        let newCards = [];
-        response.forEach(card => {
-            if (card.reviewdate === null) {
-                newCards.push(card);
+        if (0 === countReviewCard || undefined === cards.reviewcards && 0 === countNewCard) {
+            if (undefined !== cards.reviewcards && 0 === countReviewCard) {
+                botCard = cards.reviewcards[0]
             }
-        });
-        let str = "<img src='img/botavatar.png' alt='Chatbot' class='avatar' /> "+newCards[0].front;
-        $('#chatlog1').append(str)
-        return newCards
-    });
-    let reviewCards = cards.then((response) => {
-        let reviewCards = [];
-        response.forEach(card => {
-            if (card.reviewdate !== null && new Date(card.reviewdate).toISOString().replace(/T.+/,'') !== new Date(card.reviewdate).toISOString().replace(/T.+/,'')) {
-                reviewCards.push(card);
+            if (undefined === cards.reviewcards && undefined !== cards.newcards && 0 === countNewCard) {
+                botCard = cards.newcards[0]
             }
-        })
-        return reviewCards;
-    });
-    let otherCards = cards.then((response) => {
-        let reviewCards = [];
-        response.forEach(card => {
-            if (new Date(card.reviewdate).toISOString().replace(/T.+/,'') === new Date(card.reviewdate).toISOString().replace(/T.+/,'')) {
-                reviewCards.push(card);
-            }
-        })
-        return reviewCards;
-    });
-
-    //links
-    //http://eloquentjavascript.net/09_regexp.html
-    //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
-
-    let messages = [], //array that hold the record of each string in chat
-        lastUserMessage = "", //keeps track of the most recent input string from the user
-        botMessage = "", //var keeps track of what the chatbot is going to say
-        botavatar = "<img src='img/botavatar.png' alt='Chatbot' class='avatar' /> ",
-        botName = 'Chatbot', //name of the chatbot
-        talking = true,
-        color,
-    countCard = 0; //when false the speach function doesn't work
-
-
-    //edit this function to change what the chatbot says
-    function chatbotResponse(cards) {
-        talking = true;
-        botMessage = cards[0].front; //the default message
-
-        if (lastUserMessage === cards[countCard].back) {
-            color = 'green';
+            messages.push(botavatar + botCard.front)
+        }
+        
+        //pulls the value from the chatbox ands sets it to lastUserMessage
+        lastUserMessage = document.getElementById("chatbox").value;
+        //sets the chat box to be clear
+        document.getElementById("chatbox").value = "";
+        //adds the value of the chatbox to the array messages
+        messages.push("<p class='text-right'>"+lastUserMessage + " <img src='img/useravatar.png' class='avatar' /></p>");
+        //Speech(lastUserMessage);  //says what the user typed outloud
+        //sets the variable botMessage in response to lastUserMessage
+        chatbotResponse(botCard);
+        //add the chatbot's name and message to the array messages
+        botMessage = botCard.back
+        messages.push(botavatar + "<b style='color: "+color+";'>" + botMessage + "</b>");
+        // says the message using the text to speech function written below
+        Speech(botMessage, 'en-US');
+        if (undefined !== cards.reviewcards && countReviewCard < (cards.reviewcards.length-1)) {
+            countReviewCard++;
+            botCard = cards.reviewcards[countReviewCard]
+            messages.push(botavatar + botCard.front)
+        } else if (undefined === cards.reviewcards && undefined !== cards.newCards && countNewCard < (cards.newCards.length-1)) {
+            countNewCard++;
+            botCard = cards.newCards[countNewCard]
+            messages.push(botavatar + botCard.front)
         }
         else {
-            color = 'red';
+            messages.push(botavatar + "Vous avez fini la révision, revenir à <a href='/'>l'accueil</a>")
+        }
+        //outputs the last few array elements of messages to html
+        for (var i = 1; i < 8; i++) {
+            if (messages[messages.length - i])
+                document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
         }
     }
-    //this runs each time enter is pressed.
-    //It controls the overall input and output
-    async function newEntry() {
-        //if the message from the user isn't empty then run
-        if (document.getElementById("chatbox").value != "") {
-            let botCards = await newCards;
-            if (countCard === 0) {
-                messages.push(botavatar + botCards[countCard].front)
-            }
-            //pulls the value from the chatbox ands sets it to lastUserMessage
-            lastUserMessage = document.getElementById("chatbox").value;
-            //sets the chat box to be clear
-            document.getElementById("chatbox").value = "";
-            //adds the value of the chatbox to the array messages
-            messages.push("<p class='text-right'>"+lastUserMessage + " <img src='img/useravatar.png' class='avatar' /></p>");
-            //Speech(lastUserMessage);  //says what the user typed outloud
-            //sets the variable botMessage in response to lastUserMessage
-            chatbotResponse(botCards);
-            //add the chatbot's name and message to the array messages
-            messages.push(botavatar + "<b style='color: "+color+";'>" + botCards[countCard].back + "</b>");
-            // says the message using the text to speech function written below
-            Speech(botCards[countCard].back);
-            if (countCard < (botCards.length-1)) {
-                countCard++;
-                messages.push(botavatar + botCards[countCard].front)
-            } else if (countCard === (botCards.length-1)) {
-                messages.push(botavatar + "Vous avez fini la révision, revenir à <a href='/'>l'accueil</a>")
-            }
-            //outputs the last few array elements of messages to html
-            for (var i = 1; i < 8; i++) {
-                if (messages[messages.length - i])
-                    document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
-            }
-        }
-    }
+}
 
-    //text to Speech
-    //https://developers.google.com/web/updates/2014/01/Web-apps-that-talk-Introduction-to-the-Speech-Synthesis-API
-    function Speech(say) {
-        if ('speechSynthesis' in window && talking) {
-            var utterance = new SpeechSynthesisUtterance(say);
-            //msg.voice = voices[10]; // Note: some voices don't support altering params
-            //msg.voiceURI = 'native';
-            //utterance.volume = 1; // 0 to 1
-            //utterance.rate = 0.1; // 0.1 to 10
-            //utterance.pitch = 1; //0 to 2
-            //utterance.text = 'Hello World';
-            utterance.lang = 'en-US';
-            speechSynthesis.speak(utterance);
-        }
+//text to Speech
+//https://developers.google.com/web/updates/2014/01/Web-apps-that-talk-Introduction-to-the-Speech-Synthesis-API
+function Speech(say, language) {
+    if ('speechSynthesis' in window && talking) {
+        var utterance = new SpeechSynthesisUtterance(say);
+        //msg.voice = voices[10]; // Note: some voices don't support altering params
+        //msg.voiceURI = 'native';
+        //utterance.volume = 1; // 0 to 1
+        //utterance.rate = 0.1; // 0.1 to 10
+        //utterance.pitch = 1; //0 to 2
+        //utterance.text = 'Hello World';
+        utterance.lang = language;
+        speechSynthesis.speak(utterance);
     }
+}
 
-    //runs the keypress() function when a key is pressed
-    document.onkeypress = keyPress;
-    //if the key pressed is 'enter' runs the function newEntry()
-    function keyPress(e) {
-        var x = e || window.event;
-        var key = (x.keyCode || x.which);
-        if (key == 13 || key == 3) {
-            //runs this function when enter is pressed
-            newEntry();
-        }
-        if (key == 38) {
-            console.log('hi')
-            //document.getElementById("chatbox").value = lastUserMessage;
-        }
+//runs the keypress() function when a key is pressed
+document.onkeypress = keyPress;
+//if the key pressed is 'enter' runs the function newEntry()
+function keyPress(e) {
+    var x = e || window.event;
+    var key = (x.keyCode || x.which);
+    if (key == 13 || key == 3) {
+        //runs this function when enter is pressed
+        newEntry();
     }
-
-    //clears the placeholder text ion the chatbox
-    //this function is set to run when the users brings focus to the chatbox, by clicking on it
-    function placeHolder() {
-        document.getElementById("chatbox").placeholder = "";
+    if (key == 38) {
+        console.log('hi')
+        //document.getElementById("chatbox").value = lastUserMessage;
     }
+}
 
+//clears the placeholder text ion the chatbox
+//this function is set to run when the users brings focus to the chatbox, by clicking on it
+function placeHolder() {
+    document.getElementById("chatbox").placeholder = "";
+}
 </script>
 <%- include('template/footer') %> 

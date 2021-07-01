@@ -17,8 +17,10 @@ router.get('/bot', async (req, res) => {
     if(req.session.token === undefined){
         res.redirect('/login')
     }
+    const cards = await CardModel.find({ fkdeck: req.query.iddeck })
+    console.log(cards)
     const css = "/css/main.css"
-    res.render('chatbot', {title: "MemoBot", css})
+    res.render('chatbot', {title: "MemoBot", css, cards: cards })
 });
 
 router.get('/login', async (req, res) => {
