@@ -42,13 +42,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
       env:
         CI: true
-        DB_HOST: 127.0.0.1
-        DB_DATABASE: epsi
-        DB_USER: root
-        DB_PASS: password
-        SECRET_JWT: supersecret
-        PORT: 3000
     - run: |
+        echo -e "DB_HOST=127.0.0.1\nDB_DATABASE=epsi\nDB_USER=root\nDB_PASS=password\nSECRET_JWT=supersecret\nPORT=3000" > .env
         npm ci
         npm run build --if-present
         npm test
