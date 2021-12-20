@@ -18,30 +18,37 @@ jobs:
       matrix:
         node-version: [12.x, 14.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    
-    env:
-      DB_DATABASE: epsi
-      DB_USER: root
-      DB_PASSWORD: root
+      
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: password
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     steps:
     - uses: actions/checkout@v2
     - name: Set up MySQL
       run: |
-        sudo /etc/init.d/mysql start
-        mysql -e 'CREATE DATABASE ${{ env.DB_DATABASE }};' -u${{ env.DB_USER }} -p${{ env.DB_PASSWORD }}
-        mysql -u ${{ env.DB_USER }} -p${{ env.DB_PASSWORD }} < src/db/create-db.sql
+        npm install
+        sudo service mysql start
+        mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -ppassword < src/db/create-db.sql
+        mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -ppassword -e "SHOW DATABASES"
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
       env:
-        DB_HOST: mysql
+        CI: true
+        DB_HOST: 127.0.0.1
         DB_DATABASE: epsi
-        DB_USER: ${{ env.DB_USER }}
-        DB_PASS: ${{ env.DB_PASSWORD }}
+        DB_USER: root
+        DB_PASS: password
         SECRET_JWT: supersecret
         PORT: 3000
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - run: |
+        npm ci
+        npm run build --if-present
+        npm test
