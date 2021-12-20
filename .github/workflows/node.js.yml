@@ -40,7 +40,7 @@ jobs:
         sudo service mysql start
         mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -ppassword < src/db/create-db.sql
         mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -ppassword -e "SHOW DATABASES"
-        echo -e "DB_HOST=127.0.0.1\nDB_DATABASE=epsi\nDB_USER=root\nDB_PASS=password\nSECRET_JWT=supersecret\nPORT=${{ job.services.mysql.ports['3306'] }}" > .env
+        echo -e "DB_HOST=127.0.0.1\nDB_DATABASE=epsi\nDB_USER=root\nDB_PASS=password\nDB_PORT=${{ job.services.mysql.ports['3306'] }}\nSECRET_JWT=supersecret\nPORT=3000" > .env
         npm run build --if-present
         npm test
         npm ci

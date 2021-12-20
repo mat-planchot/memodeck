@@ -27,7 +27,6 @@ beforeAll(async () => {
             deckname: "deck",
             fkuser: iduser
         });
-    console.log(createDeck.body)
     const getDeck = await request.get('/api/v1/decks/deckname/deck')
         .set('Authorization', `Bearer ${token}`);
     iddeck = getDeck.body.iddeck
@@ -39,7 +38,6 @@ beforeAll(async () => {
             fkdeck: iddeck,
             reviewdate: null
         });
-    console.log(createCard.body)
     const getCard = await request.post('/api/v1/cards/front')
         .set('Authorization', `Bearer ${token}`)
         .send({
@@ -256,7 +254,6 @@ describe ('/api/v1/cards', () => {
             .send({
                 front: "question"
             });
-        console.log(getCard.body)
         let nbreview = getCard.body.nbreview + 1;
         let difficulty = getCard.body.nbdayreview + 0.25;
         let nbdayreview = Math.round(getCard.body.nbdayreview * difficulty);
