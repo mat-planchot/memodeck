@@ -257,6 +257,9 @@ describe ('/api/v1/cards', () => {
         let nbreview = getCard.body.nbreview + 1;
         let difficulty = getCard.body.nbdayreview + 0.25;
         let nbdayreview = Math.round(getCard.body.nbdayreview * difficulty);
+        expect(nbreview).toBe(2)
+        expect(difficulty).toBe(1.25)
+        expect(nbdayreview).toBe(1)
         const updateReviewDate = await request.patch('/api/v1/cards/dayreview/'+idcard)
             .set('Authorization', `Bearer ${token}`)
             .send({
@@ -274,7 +277,13 @@ describe ('/api/v1/cards', () => {
         expect(getCardGood.body.nbdayreview).toBe(nbdayreview)
         expect(getCardGood.body.difficulty).toBe(difficulty)
         expect(getCardGood.body.nbreview).toBe(nbreview)
-        let date = new Date(getCardGood.body.reviewdate).toISOString().replace(/T.+/,'')
-        expect(date).toBe(new Date().toISOString().replace(/T.+/,''))
+        let date = new Date(getCardGood.body.reviewdate)
+        // error with mysql docker container
+        date.setHours(date.getHours()+1)
+        date = date.toISOString().replace(/T.+/,'')
+        let tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate()+1);
+        tomorrow = tomorrow.toISOString().replace(/T.+/,'')
+        expect(date).toBe(tomorrow)
     })
 })

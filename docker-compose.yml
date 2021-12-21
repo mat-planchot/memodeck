@@ -11,5 +11,7 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
     volumes:
       - ./src/db/:/docker-entrypoint-initdb.d
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/etc/localtime:/etc/localtime:ro"
     ports:
-      - '${MYSQL_PORT}:3306'
+      - '${DB_PORT}:3306'
