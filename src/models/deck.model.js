@@ -52,7 +52,7 @@ class DeckModel {
     update = async (params, id) => {
         const { columnSet, values } = multipleColumnSet(params)
 
-        const sql = `UPDATE deck SET ${columnSet} WHERE iddeck = ?`;
+        const sql = `UPDATE ${this.tableName} SET ${columnSet} WHERE iddeck = ?`;
 
         const result = await query(sql, [...values, id]);
 

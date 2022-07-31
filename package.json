@@ -1,7 +1,7 @@
 {
   "name": "memodeck",
   "version": "1.0.0",
-  "description": "",
+  "description": "Spaced revision with a chatbot",
   "main": "src/server.js",
   "scripts": {
     "start": "nodemon",

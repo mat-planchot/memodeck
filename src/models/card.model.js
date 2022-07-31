@@ -2,8 +2,6 @@ const query = require('../db/db-connection');
 const { multipleColumnSet } = require('../utils/common.utils');
 const Role = require('../utils/userRoles.utils');
 
-
-
 /******************************************************************************
  *                              Card Model
  *
@@ -101,7 +99,7 @@ class CardModel {
         const { columnSet, values } = multipleColumnSet(params)
 
         // columnSet for partial edit
-        const sql = `UPDATE card SET ${columnSet} WHERE idcard = ?`;
+        const sql = `UPDATE ${this.tableName} SET ${columnSet} WHERE idcard = ?`;
 
         const result = await query(sql, [...values, id]);
 
@@ -116,7 +114,7 @@ class CardModel {
         const { columnSet, values } = multipleColumnSet(params)
 
         // it can be partial edit but it must contain the number of days to the next review (nbdayreview)
-        const sql = `UPDATE card SET ${columnSet}, 
+        const sql = `UPDATE ${this.tableName} SET ${columnSet}, 
         reviewdate = (NOW() + INTERVAL ? DAY)
         WHERE idcard = ?`;
 

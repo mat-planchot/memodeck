@@ -1,4 +1,3 @@
-DROP DATABASE IF EXISTS epsi;   
 CREATE DATABASE IF NOT EXISTS epsi;   
 USE epsi; 
 

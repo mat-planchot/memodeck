@@ -1,9 +1,10 @@
 version: '3.0'
 
 services:
-  mysql:
+  db:
     image: mariadb:latest
     restart: on-failure
+    container_name: db
     environment:
       MYSQL_USER: ${DB_USER}
       MYSQL_PASSWORD: ${DB_PASS}
@@ -13,5 +14,27 @@ services:
       - ./src/db/:/docker-entrypoint-initdb.d
       - "/etc/timezone:/etc/timezone:ro"
       - "/etc/localtime:/etc/localtime:ro"
+      - ./docker/database:/data/db
     ports:
       - '${DB_PORT}:3306'
+  web:
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodejs
+    restart: unless-stopped
+    env_file: .env-example
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_ROOT_PASSWORD: 'epsiroot'
+      MYSQL_HOSTNAME: ${DB_HOST}
+      MYSQL_DATABASE: ${DB_DATABASE}
+    ports:
+      - "80:3000"
+    volumes:
+      - .:/home/node/app
+      - /home/node/app/node_modules
+    command: npm run start

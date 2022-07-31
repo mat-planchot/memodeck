@@ -4,7 +4,6 @@ const auth = require('../middleware/auth.middleware');
 const CardModel = require('../models/card.model');
 const DeckModel = require('../models/deck.model');
 
-// localhost:3000/...
 router.get('/', async (req, res) => {
     const css = "/css/rotating-card.css"
     if(req.session.token === undefined){
